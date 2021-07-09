@@ -3,9 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "serve": "vite",
+    "build": "vue-tsc --noEmit && vite build"
   },
   "dependencies": {
     "core-js": "^3.6.5",
@@ -17,14 +16,10 @@
     "vuetify": "^2.4.0"
   },
   "devDependencies": {
+    "@types/node": "^16.3.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-pwa": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-typescript": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.5",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^7.0.0",
     "eslint": "^6.7.2",
@@ -32,10 +27,12 @@
     "eslint-plugin-vue": "^6.2.2",
     "prettier": "^2.2.1",
     "sass": "~1.32.0",
-    "sass-loader": "^10.0.0",
-    "typescript": "~4.1.5",
-    "vue-cli-plugin-vuetify": "~2.4.1",
+    "typescript": "^4.3.2",
+    "vite": "^2.4.0",
+    "vite-plugin-components": "^0.12.2",
+    "vite-plugin-vue2": "^1.7.2",
     "vue-template-compiler": "^2.6.11",
+    "vue-tsc": "^0.0.24",
     "vuetify-loader": "^1.7.0"
   }
 }
