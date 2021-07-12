@@ -8,24 +8,18 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/daystram/go-gin-gorm-boilerplate/config"
-	"github.com/daystram/go-gin-gorm-boilerplate/datatransfers"
-	"github.com/daystram/go-gin-gorm-boilerplate/models"
 )
 
 var Handler HandlerFunc
 
-type HandlerFunc interface {
-	RetrieveUser(username string) (user models.User, err error)
-	UpdateUser(id uint, user datatransfers.UserUpdate) (err error)
-}
+type HandlerFunc interface{}
 
 type module struct {
 	db *dbEntity
 }
 
 type dbEntity struct {
-	conn      *gorm.DB
-	userOrmer models.UserOrmer
+	conn *gorm.DB
 }
 
 func InitializeHandler() {
@@ -47,8 +41,7 @@ func InitializeHandler() {
 	// Compose handler modules
 	Handler = &module{
 		db: &dbEntity{
-			conn:      db,
-			userOrmer: models.NewUserOrmer(db),
+			conn: db,
 		},
 	}
 }
