@@ -9,7 +9,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
-	"github.com/daystram/go-gin-gorm-boilerplate/config"
 	"github.com/daystram/go-gin-gorm-boilerplate/constants"
 	"github.com/daystram/go-gin-gorm-boilerplate/datatransfers"
 )
@@ -21,7 +20,7 @@ func AuthMiddleware(c *gin.Context) {
 		c.Next()
 		return
 	}
-	claims, err := parseToken(token, config.AppConfig.JWTSecret)
+	claims, err := parseToken(token, "")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, datatransfers.Response{Error: err.Error()})
 		return
