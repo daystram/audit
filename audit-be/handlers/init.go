@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/daystram/go-gin-gorm-boilerplate/config"
+	"github.com/daystram/go-gin-gorm-boilerplate/models"
 )
 
 var Handler HandlerFunc
@@ -23,7 +24,9 @@ type module struct {
 }
 
 type dbEntity struct {
-	conn *gorm.DB
+	conn             *gorm.DB
+	applicationOrmer models.ApplicationOrmer
+	serviceOrmer     models.ServiceOrmer
 }
 
 type influxEntity struct {
@@ -62,7 +65,9 @@ func InitializeHandler() {
 	// Compose handler modules
 	Handler = &module{
 		db: &dbEntity{
-			conn: db,
+			conn:             db,
+			applicationOrmer: models.NewApplicationOrmer(db),
+			serviceOrmer:     models.NewServiceOrmer(db),
 		},
 		influx: &influxEntity{
 			conn:     &influx,
