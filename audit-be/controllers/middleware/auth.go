@@ -8,8 +8,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
-	"github.com/daystram/go-gin-gorm-boilerplate/constants"
-	"github.com/daystram/go-gin-gorm-boilerplate/datatransfers"
+	"github.com/daystram/audit/audit-be/constants"
+	"github.com/daystram/audit/audit-be/datatransfers"
 )
 
 func AuthMiddleware(c *gin.Context) {

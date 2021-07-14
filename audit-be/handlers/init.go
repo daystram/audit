@@ -10,8 +10,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/daystram/go-gin-gorm-boilerplate/config"
-	"github.com/daystram/go-gin-gorm-boilerplate/models"
+	"github.com/daystram/audit/audit-be/config"
+	"github.com/daystram/audit/audit-be/models"
 )
 
 var Handler HandlerFunc

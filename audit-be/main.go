@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/daystram/go-gin-gorm-boilerplate/config"
-	"github.com/daystram/go-gin-gorm-boilerplate/handlers"
-	"github.com/daystram/go-gin-gorm-boilerplate/router"
+	"github.com/daystram/audit/audit-be/config"
+	"github.com/daystram/audit/audit-be/handlers"
+	"github.com/daystram/audit/audit-be/router"
 )
 
 func init() {
