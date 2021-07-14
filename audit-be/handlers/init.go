@@ -16,7 +16,13 @@ import (
 
 var Handler HandlerFunc
 
-type HandlerFunc interface{}
+type HandlerFunc interface {
+	ApplicationGetAll() (applications []models.Application, err error)
+	ApplicationGetOne() (application models.Application, err error)
+	ApplicationCreate() (application models.Application, err error)
+	ApplicationUpdate() (err error)
+	ApplicationDelete() (err error)
+}
 
 type module struct {
 	db     *dbEntity
