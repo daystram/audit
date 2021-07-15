@@ -11,17 +11,19 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/daystram/audit/audit-be/config"
+	"github.com/daystram/audit/audit-be/datatransfers"
 	"github.com/daystram/audit/audit-be/models"
 )
 
 var Handler HandlerFunc
 
 type HandlerFunc interface {
-	ApplicationGetAll() (applications []models.Application, err error)
-	ApplicationGetOne() (application models.Application, err error)
-	ApplicationCreate() (application models.Application, err error)
-	ApplicationUpdate() (err error)
-	ApplicationDelete() (err error)
+	// Application
+	ApplicationGetAll() (applicationInfos []datatransfers.ApplicationInfo, err error)
+	ApplicationGetOne(applicationID string) (applicationInfo datatransfers.ApplicationInfo, err error)
+	ApplicationCreate(applicationInfo datatransfers.ApplicationInfo) (applicationID string, err error)
+	ApplicationUpdate(applicationInfo datatransfers.ApplicationInfo) (err error)
+	ApplicationDelete(applicationID string) (err error)
 }
 
 type module struct {

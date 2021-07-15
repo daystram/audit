@@ -5,7 +5,7 @@ type ApplicationInfo struct {
 
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description" binding:"required"`
-	CreatedAt   int64  `json:"createdAt,omitempty" binding:"-"`
 
+	CreatedAt int64 `json:"createdAt,omitempty" binding:"-"`
 	UpdatedAt int64 `json:"updatedAt,omitempty" binding:"-"`
 }
