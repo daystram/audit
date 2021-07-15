@@ -52,11 +52,9 @@ jobs:
       - name: Install Dependencies
         run: go mod tidy
       - name: Test
-        run: go test ./... -v -coverprofile=coverage.xml
+        run: go test ./... -v -coverprofile=coverage.txt
       - name: Upload to Codecov
         uses: codecov/codecov-action@v1
-        with:
-          files: ./coverage.xml
   lint-fe:
     name: Lint audit-fe
     runs-on: ubuntu-latest
