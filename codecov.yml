@@ -1,0 +1,21 @@
+# Setting coverage targets per flag
+coverage:
+  status:
+    project:
+      default:
+        target: 90%
+
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+  require_changes: false
+
+flags:
+  audit-be:
+    paths:
+      - audit-be
+    carryforward: false
+  audit-fe:
+    paths:
+      - audit-fe
+    carryforward: false
