@@ -35,6 +35,28 @@ jobs:
           name: be-build
           path: |
             audit-be/app
+  test-be:
+    name: Test audit-be
+    runs-on: Ubuntu-20.04
+    needs: [build-be]
+    defaults:
+      run:
+        working-directory: audit-be
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
+      - name: Install Dependencies
+        run: go mod tidy
+      - name: Test
+        run: go test ./... -v -coverprofile=coverage.xml
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
   lint-fe:
     name: Lint audit-fe
     runs-on: ubuntu-latest
