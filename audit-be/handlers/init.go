@@ -43,9 +43,7 @@ type influxEntity struct {
 	queryAPI api.QueryAPI
 }
 
-func InitializeHandler() {
-	var err error
-
+func InitializeHandler() (err error) {
 	// Initialize DB
 	var db *gorm.DB
 	db, err = gorm.Open(postgres.Open(
@@ -54,7 +52,7 @@ func InitializeHandler() {
 			config.AppConfig.DBUsername, config.AppConfig.DBPassword),
 	), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("[INIT] Failed connecting to PostgreSQL at %s:%d. %+v\n", config.AppConfig.DBHost, config.AppConfig.DBPort, err)
+		return fmt.Errorf("failed connecting to PostgreSQL at %s:%d. %+v", config.AppConfig.DBHost, config.AppConfig.DBPort, err)
 	}
 	log.Printf("[INIT] Successfully connected to PostgreSQL\n")
 
@@ -63,10 +61,10 @@ func InitializeHandler() {
 	influx := influxlib.NewClient(config.AppConfig.InfluxDBURL, config.AppConfig.InfluxDBToken)
 	ready, err = influx.Ready(context.Background())
 	if err != nil {
-		log.Fatalf("[INIT] Failed connecting to InfluxDB at %s. %+v\n", config.AppConfig.InfluxDBURL, err)
+		return fmt.Errorf("failed connecting to InfluxDB at %s. %+v", config.AppConfig.InfluxDBURL, err)
 	}
 	if !ready {
-		log.Fatalf("[INIT] Failed connecting to InfluxDB at %s. influxdb instance not ready\n", config.AppConfig.InfluxDBURL)
+		return fmt.Errorf("failed connecting to InfluxDB at %s. influxdb instance not ready", config.AppConfig.InfluxDBURL)
 	}
 	log.Printf("[INIT] Successfully connected to InfluxDB\n")
 
@@ -83,4 +81,5 @@ func InitializeHandler() {
 			queryAPI: influx.QueryAPI(config.AppConfig.InfluxDBOrganization),
 		},
 	}
+	return
 }

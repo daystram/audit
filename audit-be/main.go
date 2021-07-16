@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -20,7 +21,10 @@ func init() {
 }
 
 func main() {
-	handlers.InitializeHandler()
+	if err := handlers.InitializeHandler(); err != nil {
+		fmt.Print("pasd")
+		log.Fatal(err)
+	}
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", config.AppConfig.Port),
 		Handler:        router.InitializeRouter(),
