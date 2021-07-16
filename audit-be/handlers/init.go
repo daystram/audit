@@ -24,6 +24,13 @@ type HandlerFunc interface {
 	ApplicationCreate(applicationInfo datatransfers.ApplicationInfo) (applicationID string, err error)
 	ApplicationUpdate(applicationInfo datatransfers.ApplicationInfo) (err error)
 	ApplicationDelete(applicationID string) (err error)
+
+	// Service
+	ServiceGetAll(applicationID string) (serviceInfos []datatransfers.ServiceInfo, err error)
+	ServiceGetOne(serviceID, applicationID string) (applicationInfo datatransfers.ServiceInfo, err error)
+	ServiceCreate(serviceInfo datatransfers.ServiceInfo) (serviceID string, err error)
+	ServiceUpdate(serviceInfo datatransfers.ServiceInfo) (err error)
+	ServiceDelete(serviceID, applicationID string) (err error)
 }
 
 type module struct {

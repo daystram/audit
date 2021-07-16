@@ -106,3 +106,76 @@ func (mr *MockHandlerFuncMockRecorder) ApplicationUpdate(applicationInfo interfa
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplicationUpdate", reflect.TypeOf((*MockHandlerFunc)(nil).ApplicationUpdate), applicationInfo)
 }
+
+// ServiceCreate mocks base method.
+func (m *MockHandlerFunc) ServiceCreate(serviceInfo datatransfers.ServiceInfo) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ServiceCreate", serviceInfo)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ServiceCreate indicates an expected call of ServiceCreate.
+func (mr *MockHandlerFuncMockRecorder) ServiceCreate(serviceInfo interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceCreate", reflect.TypeOf((*MockHandlerFunc)(nil).ServiceCreate), serviceInfo)
+}
+
+// ServiceDelete mocks base method.
+func (m *MockHandlerFunc) ServiceDelete(serviceID, applicationID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ServiceDelete", serviceID, applicationID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ServiceDelete indicates an expected call of ServiceDelete.
+func (mr *MockHandlerFuncMockRecorder) ServiceDelete(serviceID, applicationID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceDelete", reflect.TypeOf((*MockHandlerFunc)(nil).ServiceDelete), serviceID, applicationID)
+}
+
+// ServiceGetAll mocks base method.
+func (m *MockHandlerFunc) ServiceGetAll(applicationID string) ([]datatransfers.ServiceInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ServiceGetAll", applicationID)
+	ret0, _ := ret[0].([]datatransfers.ServiceInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ServiceGetAll indicates an expected call of ServiceGetAll.
+func (mr *MockHandlerFuncMockRecorder) ServiceGetAll(applicationID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceGetAll", reflect.TypeOf((*MockHandlerFunc)(nil).ServiceGetAll), applicationID)
+}
+
+// ServiceGetOne mocks base method.
+func (m *MockHandlerFunc) ServiceGetOne(serviceID, applicationID string) (datatransfers.ServiceInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ServiceGetOne", serviceID, applicationID)
+	ret0, _ := ret[0].(datatransfers.ServiceInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ServiceGetOne indicates an expected call of ServiceGetOne.
+func (mr *MockHandlerFuncMockRecorder) ServiceGetOne(serviceID, applicationID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceGetOne", reflect.TypeOf((*MockHandlerFunc)(nil).ServiceGetOne), serviceID, applicationID)
+}
+
+// ServiceUpdate mocks base method.
+func (m *MockHandlerFunc) ServiceUpdate(serviceInfo datatransfers.ServiceInfo) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ServiceUpdate", serviceInfo)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ServiceUpdate indicates an expected call of ServiceUpdate.
+func (mr *MockHandlerFuncMockRecorder) ServiceUpdate(serviceInfo interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ServiceUpdate", reflect.TypeOf((*MockHandlerFunc)(nil).ServiceUpdate), serviceInfo)
+}
