@@ -54,7 +54,7 @@ func (o *serviceOrm) Insert(service Service) (ID string, err error) {
 }
 
 func (o *serviceOrm) Update(service Service) (err error) {
-	result := o.db.Model(&Service{}).Where("ID = ?", service.ID).Updates(&service)
+	result := o.db.Model(&Service{}).Where("ID = ? AND application_id = ?", service.ID, service.ApplicationID).Updates(&service)
 	return result.Error
 }
 
