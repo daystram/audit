@@ -12,5 +12,5 @@ type ServiceInfo struct {
 	Showcase    bool   `json:"showcase" binding:"required"`
 
 	CreatedAt int64 `json:"createdAt" binding:"-"`
-	UpdatedAt int64 `json:"modifiedAt" binding:"-"`
+	UpdatedAt int64 `json:"updatedAt" binding:"-"`
 }
