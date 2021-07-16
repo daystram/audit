@@ -21,13 +21,13 @@ func init() {
 }
 
 func main() {
-	if err := handlers.InitializeHandler(); err != nil {
-		fmt.Print("pasd")
+	h, err := handlers.InitializeHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", config.AppConfig.Port),
-		Handler:        controllers.InitializeRouter(),
+		Handler:        controllers.InitializeRouter(h),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
