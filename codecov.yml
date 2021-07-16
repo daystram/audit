@@ -10,6 +10,9 @@ comment:
   behavior: default
   require_changes: false
 
+ignore:
+  - "audit-be/**/init.go"
+
 flags:
   audit-be:
     paths:
