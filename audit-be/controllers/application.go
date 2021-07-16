@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 
 	"github.com/daystram/audit/audit-be/datatransfers"
 	"github.com/daystram/audit/audit-be/handlers"
@@ -48,9 +49,13 @@ func GETApplicationDetail(h handlers.HandlerFunc) gin.HandlerFunc {
 		var err error
 		var applicationInfo datatransfers.ApplicationInfo
 		if applicationInfo, err = h.ApplicationGetOne(c.Param("application_id")); err != nil {
-			c.JSON(http.StatusInternalServerError, datatransfers.Response{
-				Error: err.Error(),
-			})
+			if err == gorm.ErrRecordNotFound {
+				c.JSON(http.StatusNotFound, datatransfers.Response{})
+			} else {
+				c.JSON(http.StatusInternalServerError, datatransfers.Response{
+					Error: err.Error(),
+				})
+			}
 			return
 		}
 		c.JSON(http.StatusOK, datatransfers.Response{
@@ -67,6 +72,7 @@ func PUTApplicationUpdate(h handlers.HandlerFunc) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, datatransfers.Response{Error: err.Error()})
 			return
 		}
+		applicationInfo.ID = c.Param("application_id")
 		if err = h.ApplicationUpdate(applicationInfo); err != nil {
 			c.JSON(http.StatusInternalServerError, datatransfers.Response{
 				Error: err.Error(),
