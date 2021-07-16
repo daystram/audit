@@ -7,6 +7,7 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
+	"gorm.io/gorm"
 
 	"github.com/daystram/audit/audit-be/datatransfers"
 	mock_models "github.com/daystram/audit/audit-be/mocks/models"
@@ -37,7 +38,7 @@ func (suite *HandlerApplicationTestSuite) TestApplicationGetAll() {
 		assert.Nil(t, err)
 	})
 	suite.T().Run("no applications", func(t *testing.T) {
-		suite.MockApplicationOrmer.EXPECT().GetAll().Return(make([]models.Application, 0), nil)
+		suite.MockApplicationOrmer.EXPECT().GetAll().Return(make([]models.Application, 0), gorm.ErrRecordNotFound)
 		applications, err := suite.Handler.ApplicationGetAll()
 		assert.Equal(t, 0, len(applications))
 		assert.Nil(t, err)
@@ -61,10 +62,10 @@ func (suite *HandlerApplicationTestSuite) TestApplicationGetOne() {
 		assert.Nil(t, err)
 	})
 	suite.T().Run("no application", func(t *testing.T) {
-		suite.MockApplicationOrmer.EXPECT().GetOneByID(gomock.Eq("app_id")).Return(models.Application{}, nil)
+		suite.MockApplicationOrmer.EXPECT().GetOneByID(gomock.Eq("app_id")).Return(models.Application{}, gorm.ErrRecordNotFound)
 		application, err := suite.Handler.ApplicationGetOne("app_id")
 		assert.Empty(t, application)
-		assert.Nil(t, err)
+		assert.NotNil(t, err)
 	})
 	suite.T().Run("has error", func(t *testing.T) {
 		suite.MockApplicationOrmer.EXPECT().GetOneByID(gomock.Eq("app_id")).Return(models.Application{}, errors.New(""))
@@ -115,7 +116,7 @@ func (suite *HandlerApplicationTestSuite) TestApplicationUpdate() {
 }
 
 func (suite *HandlerApplicationTestSuite) TestApplicationDelete() {
-	suite.T().Run("create", func(t *testing.T) {
+	suite.T().Run("delete", func(t *testing.T) {
 		suite.MockApplicationOrmer.EXPECT().DeleteByID("app_id").Return(nil)
 		err := suite.Handler.ApplicationDelete("app_id")
 		assert.Nil(t, err)

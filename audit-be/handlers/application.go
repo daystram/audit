@@ -1,13 +1,17 @@
 package handlers
 
 import (
+	"gorm.io/gorm"
+
 	"github.com/daystram/audit/audit-be/datatransfers"
 	"github.com/daystram/audit/audit-be/models"
 )
 
 func (m *module) ApplicationGetAll() (applicationInfos []datatransfers.ApplicationInfo, err error) {
 	var applications []models.Application
-	if applications, err = m.db.applicationOrmer.GetAll(); err != nil {
+	if applications, err = m.db.applicationOrmer.GetAll(); err == gorm.ErrRecordNotFound {
+		return nil, nil
+	} else if err != nil {
 		return nil, err
 	}
 	for _, application := range applications {
