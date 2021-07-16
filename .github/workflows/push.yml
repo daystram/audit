@@ -1,0 +1,100 @@
+name: Build
+on: push
+jobs:
+  lint-be:
+    name: Lint audit-be
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          working-directory: audit-be
+  build-be:
+    name: Build audit-be
+    runs-on: Ubuntu-20.04
+    defaults:
+      run:
+        working-directory: audit-be
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
+      - name: Install Dependencies
+        run: go mod tidy
+      - name: Build
+        run: go build -o app .
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: be-build
+          path: |
+            audit-be/app
+  test-be:
+    name: Test audit-be
+    runs-on: Ubuntu-20.04
+    needs: [build-be]
+    defaults:
+      run:
+        working-directory: audit-be
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
+      - name: Install Dependencies
+        run: go mod tidy
+      - name: Test
+        run: go test ./... -v -coverprofile=coverage.txt
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          flags: audit-be
+  lint-fe:
+    name: Lint audit-fe
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: audit-fe
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 12.x
+      - name: Install Dependencies
+        run: yarn install
+      - name: eslint
+        run: yarn lint
+  build-fe:
+    name: Build audit-fe
+    runs-on: Ubuntu-20.04
+    defaults:
+      run:
+        working-directory: audit-fe
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 12.x
+      - name: Install Dependencies
+        run: yarn install
+      - name: Build
+        run: yarn build
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: fe-build
+          path: |
+            audit-fe/dist/
+            audit-fe/stats.html

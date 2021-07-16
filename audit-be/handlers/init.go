@@ -1,57 +1,85 @@
 package handlers
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	influxlib "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/influxdata/influxdb-client-go/v2/api"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/daystram/go-gin-gorm-boilerplate/config"
-	"github.com/daystram/go-gin-gorm-boilerplate/datatransfers"
-	"github.com/daystram/go-gin-gorm-boilerplate/models"
+	"github.com/daystram/audit/audit-be/config"
+	"github.com/daystram/audit/audit-be/datatransfers"
+	"github.com/daystram/audit/audit-be/models"
 )
 
 var Handler HandlerFunc
 
 type HandlerFunc interface {
-	AuthenticateUser(credentials datatransfers.UserLogin) (token string, err error)
-	RegisterUser(credentials datatransfers.UserSignup) (err error)
-
-	RetrieveUser(username string) (user models.User, err error)
-	UpdateUser(id uint, user datatransfers.UserUpdate) (err error)
+	// Application
+	ApplicationGetAll() (applicationInfos []datatransfers.ApplicationInfo, err error)
+	ApplicationGetOne(applicationID string) (applicationInfo datatransfers.ApplicationInfo, err error)
+	ApplicationCreate(applicationInfo datatransfers.ApplicationInfo) (applicationID string, err error)
+	ApplicationUpdate(applicationInfo datatransfers.ApplicationInfo) (err error)
+	ApplicationDelete(applicationID string) (err error)
 }
 
 type module struct {
-	db *dbEntity
+	db     *dbEntity
+	influx *influxEntity
 }
 
 type dbEntity struct {
-	conn      *gorm.DB
-	userOrmer models.UserOrmer
+	conn             *gorm.DB
+	applicationOrmer models.ApplicationOrmer
+	serviceOrmer     models.ServiceOrmer
 }
 
-func InitializeHandler() {
-	var err error
+type influxEntity struct {
+	conn     *influxlib.Client
+	writeAPI api.WriteAPI
+	queryAPI api.QueryAPI
+}
 
+func InitializeHandler() (handler *module, err error) {
 	// Initialize DB
 	var db *gorm.DB
 	db, err = gorm.Open(postgres.Open(
 		fmt.Sprintf("host=%s port=%d dbname=%s user=%s password=%s sslmode=disable",
-			config.AppConfig.DBHostname, config.AppConfig.DBPort, config.AppConfig.DBDatabase,
+			config.AppConfig.DBHost, config.AppConfig.DBPort, config.AppConfig.DBDatabase,
 			config.AppConfig.DBUsername, config.AppConfig.DBPassword),
 	), &gorm.Config{})
 	if err != nil {
-		log.Fatalf("[INIT] Failed connecting to PostgreSQL Database at %s:%d. %+v\n",
-			config.AppConfig.DBHostname, config.AppConfig.DBPort, err)
+		return nil, fmt.Errorf("failed connecting to PostgreSQL at %s:%d. %+v", config.AppConfig.DBHost, config.AppConfig.DBPort, err)
 	}
-	log.Printf("[INIT] Successfully connected to PostgreSQL Database\n")
+	log.Printf("[INIT] Successfully connected to PostgreSQL\n")
+
+	// Initialize InfluxDB
+	var ready bool
+	influx := influxlib.NewClient(config.AppConfig.InfluxDBURL, config.AppConfig.InfluxDBToken)
+	ready, err = influx.Ready(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed connecting to InfluxDB at %s. %+v", config.AppConfig.InfluxDBURL, err)
+	}
+	if !ready {
+		return nil, fmt.Errorf("failed connecting to InfluxDB at %s. influxdb instance not ready", config.AppConfig.InfluxDBURL)
+	}
+	log.Printf("[INIT] Successfully connected to InfluxDB\n")
 
 	// Compose handler modules
-	Handler = &module{
+	handler = &module{
 		db: &dbEntity{
-			conn:      db,
-			userOrmer: models.NewUserOrmer(db),
+			conn:             db,
+			applicationOrmer: models.NewApplicationOrmer(db),
+			serviceOrmer:     models.NewServiceOrmer(db),
+		},
+		influx: &influxEntity{
+			conn:     &influx,
+			writeAPI: influx.WriteAPI(config.AppConfig.InfluxDBOrganization, config.AppConfig.InfluxDBBucket),
+			queryAPI: influx.QueryAPI(config.AppConfig.InfluxDBOrganization),
 		},
 	}
+	return
 }

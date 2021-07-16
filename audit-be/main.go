@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/daystram/go-gin-gorm-boilerplate/config"
-	"github.com/daystram/go-gin-gorm-boilerplate/handlers"
-	"github.com/daystram/go-gin-gorm-boilerplate/router"
+	"github.com/daystram/audit/audit-be/config"
+	"github.com/daystram/audit/audit-be/controllers"
+	"github.com/daystram/audit/audit-be/handlers"
 )
 
 func init() {
@@ -20,13 +21,16 @@ func init() {
 }
 
 func main() {
-	handlers.InitializeHandler()
+	h, err := handlers.InitializeHandler()
+	if err != nil {
+		log.Fatal(err)
+	}
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", config.AppConfig.Port),
-		Handler:        router.InitializeRouter(),
+		Handler:        controllers.InitializeRouter(h),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 	}
-	s.ListenAndServe()
+	_ = s.ListenAndServe()
 }

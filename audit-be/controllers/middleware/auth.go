@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -9,9 +8,8 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 
-	"github.com/daystram/go-gin-gorm-boilerplate/config"
-	"github.com/daystram/go-gin-gorm-boilerplate/constants"
-	"github.com/daystram/go-gin-gorm-boilerplate/datatransfers"
+	"github.com/daystram/audit/audit-be/constants"
+	"github.com/daystram/audit/audit-be/datatransfers"
 )
 
 func AuthMiddleware(c *gin.Context) {
@@ -21,7 +19,7 @@ func AuthMiddleware(c *gin.Context) {
 		c.Next()
 		return
 	}
-	claims, err := parseToken(token, config.AppConfig.JWTSecret)
+	claims, err := parseToken(token, "")
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, datatransfers.Response{Error: err.Error()})
 		return
@@ -35,7 +33,7 @@ func parseToken(tokenString, secret string) (claims datatransfers.JWTClaims, err
 	if token, err := jwt.ParseWithClaims(tokenString, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	}); err != nil || !token.Valid {
-		return datatransfers.JWTClaims{}, errors.New(fmt.Sprintf("invalid token. %s", err))
+		return datatransfers.JWTClaims{}, fmt.Errorf("invalid token. %s", err)
 	}
 	return
 }
