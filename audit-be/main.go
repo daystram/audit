@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/daystram/audit/audit-be/config"
+	"github.com/daystram/audit/audit-be/controllers"
 	"github.com/daystram/audit/audit-be/handlers"
-	"github.com/daystram/audit/audit-be/router"
 )
 
 func init() {
@@ -27,7 +27,7 @@ func main() {
 	}
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", config.AppConfig.Port),
-		Handler:        router.InitializeRouter(),
+		Handler:        controllers.InitializeRouter(),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
