@@ -36,6 +36,7 @@ func POSTServiceCreate(h handlers.HandlerFunc) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, datatransfers.Response{Error: err.Error()})
 			return
 		}
+		serviceInfo.ApplicationID = c.Param("application_id")
 		if serviceInfo.Type != constants.ServiceTypeHTTP && serviceInfo.Type != constants.ServiceTypeTCP && serviceInfo.Type != constants.ServiceTypeUDP {
 			c.JSON(http.StatusBadRequest, datatransfers.Response{
 				Error: fmt.Sprintf("unknown service type %s", serviceInfo.Type),
@@ -83,6 +84,13 @@ func PUTServiceUpdate(h handlers.HandlerFunc) gin.HandlerFunc {
 		}
 		serviceInfo.ID = c.Param("service_id")
 		serviceInfo.ApplicationID = c.Param("application_id")
+		if serviceInfo.Type != constants.ServiceTypeHTTP && serviceInfo.Type != constants.ServiceTypeTCP && serviceInfo.Type != constants.ServiceTypeUDP {
+			c.JSON(http.StatusBadRequest, datatransfers.Response{
+				Error: fmt.Sprintf("unknown service type %s", serviceInfo.Type),
+			})
+			return
+		}
+		// TODO: validate Config
 		if err = h.ServiceUpdate(serviceInfo); err != nil {
 			c.JSON(http.StatusInternalServerError, datatransfers.Response{
 				Error: err.Error(),
