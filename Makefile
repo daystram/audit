@@ -4,7 +4,7 @@ all: build_proto generate_be_mock
 
 build_proto:
 	@echo "Building protobufs..."
-	@protoc --go_out=. proto/*.proto --go_opt=paths=source_relative
+	@protoc --go_out=. proto/*.proto --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative
 
 generate_be_mock:
 	@echo "Building audit-be mocks..."
