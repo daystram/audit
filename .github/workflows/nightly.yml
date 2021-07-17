@@ -29,6 +29,10 @@ jobs:
         run: echo "RELEASE_VERSION=dev" >> $GITHUB_ENV
       - name: Provide Env File
         run: echo "${{ secrets.FE_ENV_FILE }}" > ${{ env.APPLICATION }}-${{ matrix.service }}/.env.production
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
       - name: Generate Files
         run: |
           sudo apt install -y protobuf-compiler
