@@ -12,7 +12,7 @@ jobs:
       APPLICATION: audit
     strategy:
       matrix:
-        service: [be, fe]
+        service: [be, fe, tr]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2

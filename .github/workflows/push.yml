@@ -38,7 +38,7 @@ jobs:
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: be-build
+          name: build-be
           path: |
             audit-be/app
   test-be:
@@ -106,7 +106,47 @@ jobs:
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: fe-build
+          name: build-fe
           path: |
             audit-fe/dist/
             audit-fe/stats.html
+  lint-tr:
+    name: Lint audit-tr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          working-directory: audit-tr
+  build-tr:
+    name: Build audit-tr
+    runs-on: Ubuntu-20.04
+    defaults:
+      run:
+        working-directory: audit-tr
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
+      - name: Generate Files
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
+          go install github.com/golang/mock/mockgen@v1.6.0
+          make -C ..
+      - name: Install Dependencies
+        run: go mod tidy
+      - name: Build
+        run: go build -o app .
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-tr
+          path: |
+            audit-tr/app
