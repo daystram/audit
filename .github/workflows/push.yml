@@ -28,7 +28,7 @@ jobs:
       - name: Generate Files
         run: |
           sudo apt install -y protobuf-compiler
-          go install google.golang.org/protobuf/cmd/protoc-gen-go
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
           go install github.com/golang/mock/mockgen@v1.6.0
           make -C ..
       - name: Install Dependencies
@@ -58,7 +58,7 @@ jobs:
       - name: Generate Files
         run: |
           sudo apt install -y protobuf-compiler
-          go install google.golang.org/protobuf/cmd/protoc-gen-go
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
           go install github.com/golang/mock/mockgen@v1.6.0
           make -C ..
       - name: Install Dependencies
