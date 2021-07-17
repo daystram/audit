@@ -28,8 +28,9 @@ jobs:
       - name: Generate Files
         run: |
           sudo apt install -y protobuf-compiler
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
-          go install github.com/golang/mock/mockgen@v1.6.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
           make -C ..
       - name: Install Dependencies
         run: go mod tidy
@@ -58,8 +59,9 @@ jobs:
       - name: Generate Files
         run: |
           sudo apt install -y protobuf-compiler
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
-          go install github.com/golang/mock/mockgen@v1.6.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
           make -C ..
       - name: Install Dependencies
         run: go mod tidy
@@ -137,8 +139,9 @@ jobs:
       - name: Generate Files
         run: |
           sudo apt install -y protobuf-compiler
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1
-          go install github.com/golang/mock/mockgen@v1.6.0
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
           make -C ..
       - name: Install Dependencies
         run: go mod tidy
