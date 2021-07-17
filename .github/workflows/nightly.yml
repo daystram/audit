@@ -29,10 +29,16 @@ jobs:
         run: echo "RELEASE_VERSION=dev" >> $GITHUB_ENV
       - name: Provide Env File
         run: echo "${{ secrets.FE_ENV_FILE }}" > ${{ env.APPLICATION }}-${{ matrix.service }}/.env.production
+      - name: Generate Files
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go
+          go install github.com/golang/mock/mockgen@v1.6.0
+          make -C ..
       - name: Build and Push Image
         uses: docker/build-push-action@v2
         with:
-          context: ${{ env.APPLICATION }}-${{ matrix.service }}
+          file: ${{ env.APPLICATION }}-${{ matrix.service }}/Dockerfile
           platforms: linux/amd64
           tags: daystram/${{ env.APPLICATION }}:${{ matrix.service }}-${{ env.RELEASE_VERSION }}
           push: true

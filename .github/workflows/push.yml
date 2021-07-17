@@ -26,7 +26,11 @@ jobs:
         with:
           go-version: "^1.16"
       - name: Generate Files
-        run: make -C ..
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go
+          go install github.com/golang/mock/mockgen@v1.6.0
+          make -C ..
       - name: Install Dependencies
         run: go mod tidy
       - name: Build
@@ -52,7 +56,11 @@ jobs:
         with:
           go-version: "^1.16"
       - name: Generate Files
-        run: make -C ..
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go
+          go install github.com/golang/mock/mockgen@v1.6.0
+          make -C ..
       - name: Install Dependencies
         run: go mod tidy
       - name: Test
@@ -92,7 +100,7 @@ jobs:
         with:
           node-version: 12.x
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
       - name: Build
         run: yarn build
       - name: Archive Artifacts
