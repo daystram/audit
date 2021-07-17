@@ -3,26 +3,27 @@ package proto;
 
 option go_package = "github.com/daystram/audit/proto";
 
-
-enum MessageCode {
-  OK = 0;
-  ERROR = 1;
+enum MessageType {
+  MESSAGE_TYPE_ERROR = 0;
+  MESSAGE_TYPE_PING = 1;
+  MESSAGE_TYPE_TRACKING = 2;
 }
 
 enum ServiceType {
-  HTTP = 0;
-  TCP = 1;
-  UDP = 2;
+  SERVICE_TYPE_UNKNOWN = 0;
+  SERVICE_TYPE_HTTP = 1;
+  SERVICE_TYPE_TCP = 2;
+  SERVICE_TYPE_UDP = 3;
 }
 
 enum ServiceStatus {
-  UNKNOWN = 0;
-  UP = 1;
-  UNREACHABLE = 2;
+  SERVICE_STATUS_UNKNOWN = 0;
+  SERVICE_STATUS_UP = 1;
+  SERVICE_STATUS_UNREACHABLE = 2;
 }
 
 message TrackingMessage {
-  MessageCode code = 1;
+  MessageType code = 1;
   oneof Body {
     TrackingRequest request = 2;
     TrackingResponse response = 3;
@@ -44,4 +45,15 @@ message TrackingResponse {
   ServiceStatus status = 3;
   int32 response_time = 4;
   int32 executedAt = 5;
+}
+
+message SubscriptionRequest {
+  string tracker_id = 1;
+}
+
+message Empty {}
+
+service Tracker {
+  rpc Subscribe(SubscriptionRequest) returns (stream TrackingMessage) {}
+  rpc Report(TrackingMessage) returns (Empty) {}
 }
