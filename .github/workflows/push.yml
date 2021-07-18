@@ -23,6 +23,8 @@ jobs:
           make -C ..
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
   build-be:
     name: Build audit-be
     runs-on: Ubuntu-20.04
@@ -145,6 +147,8 @@ jobs:
           make -C ..
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
   build-tr:
     name: Build audit-tr
     runs-on: Ubuntu-20.04
