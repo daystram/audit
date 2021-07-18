@@ -4,6 +4,9 @@ coverage:
     project:
       default:
         target: 80%
+    patch:
+      default:
+        informational: true
 
 comment:
   layout: "reach, diff, flags, files"
