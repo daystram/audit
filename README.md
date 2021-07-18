@@ -29,7 +29,7 @@ The application comes in two parts:
 ## Develop
 
 ### Generate Protobuf and Mocks
-The project relies on some parts of the code being generated, notably the protocol buffers and the mocks used for testing. To generate these files, install [protoc](https://grpc.io/docs/protoc-installation``) and [mockgen](https://github.com/golang/mock). Then run the target on the Makefile.
+The project relies on some parts of the code being generated, notably the protocol buffers and the mocks used for testing. To generate these files, install [protoc](https://grpc.io/docs/protoc-installation) and [mockgen](https://github.com/golang/mock). Then run the target on the Makefile.
 
 Install the Go and Go gRPC plugin for protoc:
 ```shell
