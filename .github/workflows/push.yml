@@ -25,6 +25,8 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
+          skip-go-installation: true
+          skip-pkg-cache: true
   build-be:
     name: Build audit-be
     runs-on: Ubuntu-20.04
@@ -149,6 +151,8 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
+          skip-go-installation: true
+          skip-pkg-cache: true
   build-tr:
     name: Build audit-tr
     runs-on: Ubuntu-20.04
