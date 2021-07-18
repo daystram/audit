@@ -53,7 +53,8 @@ func (m *module) InitializeTrackerServer(port int) {
 		if err := grpcServer.Serve(lis); err != nil {
 			log.Fatalf("[TrackerServer] failed starting server. %v", err)
 		}
-	}()}
+	}()
+}
 
 // implements pb.UnimplementedTrackerServer
 func (s *trackerServerModule) Subscribe(request *pb.SubscriptionRequest, stream pb.Tracker_SubscribeServer) (err error) {
