@@ -13,6 +13,8 @@ type Config struct {
 	Environment string
 	Debug       bool
 
+	TrackerServerPort int
+
 	DBHost     string
 	DBPort     int
 	DBDatabase string
@@ -26,7 +28,7 @@ type Config struct {
 }
 
 func InitializeAppConfig() {
-	viper.SetConfigName(".env") // for development
+	viper.SetConfigName(".env") // allow directly reading from .env file
 	viper.SetConfigType("env")
 	viper.AddConfigPath(".")
 	viper.AddConfigPath("./config")
@@ -38,6 +40,8 @@ func InitializeAppConfig() {
 	AppConfig.Port = viper.GetInt("PORT")
 	AppConfig.Environment = viper.GetString("ENVIRONMENT")
 	AppConfig.Debug = viper.GetBool("DEBUG")
+
+	AppConfig.TrackerServerPort = viper.GetInt("TRACKER_SERVER_PORT")
 
 	AppConfig.DBHost = viper.GetString("DB_HOST")
 	AppConfig.DBPort = viper.GetInt("DB_PORT")
