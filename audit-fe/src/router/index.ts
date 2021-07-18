@@ -1,19 +1,17 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import Home from "../views/Home.vue";
+import { Home } from "@/views";
 
 Vue.use(VueRouter);
 
 const routes: Array<RouteConfig> = [
   {
     path: "/",
-    name: "Home",
+    name: "home",
     component: Home,
-  },
-  {
-    path: "/about",
-    name: "About",
-    component: () => import("../views/About.vue"),
+    meta: {
+      title: "Audit",
+    },
   },
 ];
 
@@ -21,6 +19,11 @@ const router = new VueRouter({
   mode: "history",
   base: import.meta.env.BASE_URL,
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  document.title = to?.meta?.title || "Audit";
+  next();
 });
 
 export default router;
