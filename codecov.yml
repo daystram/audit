@@ -3,7 +3,7 @@ coverage:
   status:
     project:
       default:
-        target: 90%
+        target: 80%
 
 comment:
   layout: "reach, diff, flags, files"
@@ -12,6 +12,8 @@ comment:
 
 ignore:
   - "audit-be/**/init.go"
+  - "audit-tr/**/init.go"
+  - "proto/**/*"
 
 flags:
   audit-be:
@@ -21,4 +23,8 @@ flags:
   audit-fe:
     paths:
       - audit-fe
+    carryforward: false
+  audit-tr:
+    paths:
+      - audit-tr
     carryforward: false
