@@ -5,7 +5,7 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/daystram/audit)](https://hub.docker.com/r/daystram/audit)
 [![MIT License](https://img.shields.io/github/license/daystram/audit)](https://github.com/daystram/audit/blob/master/LICENSE)
 
-**Audit** is a service monitoring and incident management service.
+**Audit** is a service monitor and incident manager.
 
 ## Features
 
