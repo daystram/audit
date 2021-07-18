@@ -31,13 +31,13 @@ type HandlerFunc interface {
 	ServiceDelete(serviceID, applicationID string) (err error)
 
 	// Tracker
-	InitializeTrackerServer()
+	InitializeTrackerServer(port int)
 }
 
 type module struct {
 	db            *dbEntity
 	influx        *influxEntity
-	trackerServer *TrackerServer
+	trackerServer TrackerServer
 }
 
 type dbEntity struct {

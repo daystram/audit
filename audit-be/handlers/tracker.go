@@ -10,112 +10,150 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/daystram/audit/audit-be/config"
+	"github.com/daystram/audit/audit-be/constants"
 	pb "github.com/daystram/audit/proto"
 )
 
-type TrackerServer struct {
+type TrackerServer interface {
+	pb.TrackerServer
+	PingTracker(trackerID string) (err error)
+	SendTrackingRequest(request *pb.TrackingRequest) (err error)
+}
+
+type TrackerClient interface {
+	Ping() (err error)
+	SetStatus(pingTime, latency int64)
+	Status() (pingTime, latency int64)
+	SendTrackingRequest(request *pb.TrackingRequest) (err error)
+}
+
+type trackerServerModule struct {
 	pb.UnimplementedTrackerServer
-	trackers map[string]*TrackerClient
+	trackers map[string]TrackerClient
 	mu       sync.RWMutex
 }
 
-type TrackerClient struct {
+type trackerClientEntity struct {
+	id         string
 	stream     pb.Tracker_SubscribeServer
 	lastPinged int64
 	latency    int64
 }
 
-func (m *module) InitializeTrackerServer() {
+func (m *module) InitializeTrackerServer(port int) {
 	grpcServer := grpc.NewServer()
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", config.AppConfig.TrackerServerPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
 	if err != nil {
-		log.Fatalf("[TrackerServer] initialization failed. %v", err)
+		log.Fatalf("[TrackerServer] failed initializing. %v", err)
 	}
-	m.trackerServer = &TrackerServer{trackers: make(map[string]*TrackerClient)}
+	m.trackerServer = &trackerServerModule{trackers: make(map[string]TrackerClient)}
 	// TODO: authentication
 	pb.RegisterTrackerServer(grpcServer, m.trackerServer)
-	go grpcServer.Serve(lis)
-}
+	go func() {
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalf("[TrackerServer] failed starting server. %v", err)
+		}
+	}()}
 
-func (s *TrackerServer) Subscribe(request *pb.SubscriptionRequest, stream pb.Tracker_SubscribeServer) (err error) {
+// implements pb.UnimplementedTrackerServer
+func (s *trackerServerModule) Subscribe(request *pb.SubscriptionRequest, stream pb.Tracker_SubscribeServer) (err error) {
 	trackerID := request.TrackerId
 	// TODO: validate client
 	s.mu.Lock()
 	if _, ok := s.trackers[trackerID]; ok {
 		s.mu.Unlock()
-		return fmt.Errorf("tracker with ID %s already registered", trackerID)
+		return fmt.Errorf("trackerID %s already registered", trackerID)
 	}
-	s.trackers[trackerID] = &TrackerClient{
+	s.trackers[trackerID] = &trackerClientEntity{
+		id:     trackerID,
 		stream: stream,
 	}
-	s.mu.Unlock()
-	log.Printf("[TrackerServer] tracker %s connected\n", trackerID)
-	s.SendTrackingRequest()
-	s.pingTracker(trackerID) // keep alive
-	return
+	s.mu.Unlock() // immediately unlock
+	log.Printf("[TrackerServer] tracker %s connected. connected trackers: %d\n", trackerID, len(s.trackers))
+	return s.PingTracker(trackerID) // keep alive: locking
 }
 
-func (s *TrackerServer) pingTracker(trackerID string) {
-	s.mu.RLock()
-	tracker := s.trackers[trackerID]
-	s.mu.RUnlock()
-	for {
-		err := tracker.stream.Send(&pb.TrackingMessage{
-			Code: pb.MessageType_MESSAGE_TYPE_PING,
-			Body: &pb.TrackingMessage_Request{
-				Request: &pb.TrackingRequest{
-					TrackerId:   trackerID,
-					RequestedAt: time.Now().UnixNano(), // only PING uses Unix nano
-				},
-			},
-		})
-		if err != nil {
-			s.mu.Lock()
-			delete(s.trackers, trackerID)
-			s.mu.Unlock()
-			log.Printf("[TrackerServer] %s disconnected. remaining trackers: %d\n", trackerID, len(s.trackers))
-			return
-		}
-		time.Sleep(time.Second)
-	}
-}
-
-func (s *TrackerServer) SendTrackingRequest() {
-	// TODO: example setup; implement
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	for trackerID, tracker := range s.trackers {
-		tracker.stream.Send(&pb.TrackingMessage{
-			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
-			Body: &pb.TrackingMessage_Request{
-				Request: &pb.TrackingRequest{
-					ApplicationId: "app_id",
-					ServiceId:     "service_id",
-					TrackerId:     trackerID,
-					Endpoint:      "service.daystram.com:80",
-				},
-			},
-		})
-		log.Printf("[TrackerServer] send request to %s", trackerID)
-	}
-}
-
-func (s *TrackerServer) ReportTrackingRequest(ctx context.Context, message *pb.TrackingMessage) (*pb.Empty, error) {
+// implements pb.UnimplementedTrackerServer
+func (s *trackerServerModule) ReportTrackingRequest(ctx context.Context, message *pb.TrackingMessage) (*pb.Empty, error) {
 	// TODO: implement
 	response := message.Body.(*pb.TrackingMessage_Response).Response
 	log.Printf("[TrackerServer] receive tracking response from %s: %+v", response.TrackerId, response)
 	return &pb.Empty{}, nil
 }
 
-func (s *TrackerServer) Pong(ctx context.Context, message *pb.TrackingMessage) (*pb.Empty, error) {
+// implements pb.UnimplementedTrackerServer
+func (s *trackerServerModule) Pong(ctx context.Context, message *pb.TrackingMessage) (*pb.Empty, error) {
 	request := message.Body.(*pb.TrackingMessage_Request).Request
 	trackerID := request.TrackerId
 	latency := time.Now().UnixNano() - request.RequestedAt
-	log.Printf("[TrackerServer] latency to %s: %dms", trackerID, latency/10e6)
+	log.Printf("[TrackerServer] latency to %s: %dms", trackerID, latency/1e6)
 	s.mu.RLock()
-	s.trackers[trackerID].lastPinged = time.Now().Unix()
-	s.trackers[trackerID].latency = latency
-	s.mu.RUnlock()
+	defer s.mu.RUnlock()
+	if client, ok := s.trackers[trackerID]; !ok {
+		return &pb.Empty{}, fmt.Errorf("unregistered trackerID %s", request.TrackerId)
+	} else {
+		client.SetStatus(time.Now().Unix(), latency)
+	}
 	return &pb.Empty{}, nil
+}
+
+func (s *trackerServerModule) PingTracker(trackerID string) (err error) {
+	var client TrackerClient
+	var ok bool
+	s.mu.RLock()
+	if client, ok = s.trackers[trackerID]; !ok {
+		return fmt.Errorf("unregistered trackerID %s", trackerID)
+	}
+	s.mu.RUnlock() // immediately unlock
+	for {
+		err = client.Ping()
+		if err != nil {
+			s.mu.Lock()
+			defer s.mu.Unlock()
+			delete(s.trackers, trackerID)
+			log.Printf("[TrackerServer] %s disconnected. connected trackers: %d\n", trackerID, len(s.trackers))
+			return
+		}
+		time.Sleep(constants.TrackerPingInterval)
+	}
+}
+
+func (s *trackerServerModule) SendTrackingRequest(request *pb.TrackingRequest) (err error) {
+	// TODO: example setup
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if client, ok := s.trackers[request.TrackerId]; ok {
+		return client.SendTrackingRequest(request)
+	}
+	return fmt.Errorf("unregistered trackerID %s", request.TrackerId)
+}
+
+func (c *trackerClientEntity) Ping() (err error) {
+	return c.stream.Send(&pb.TrackingMessage{
+		Code: pb.MessageType_MESSAGE_TYPE_PING,
+		Body: &pb.TrackingMessage_Request{
+			Request: &pb.TrackingRequest{
+				TrackerId:   c.id,
+				RequestedAt: time.Now().UnixNano(), // only PING uses Unix nano
+			},
+		},
+	})
+}
+
+func (c *trackerClientEntity) SetStatus(pingTime, latency int64) {
+	c.lastPinged = pingTime
+	c.latency = latency
+}
+
+func (c *trackerClientEntity) Status() (pingTime, latency int64) {
+	return c.lastPinged, c.latency
+}
+
+func (c *trackerClientEntity) SendTrackingRequest(request *pb.TrackingRequest) (err error) {
+	return c.stream.Send(&pb.TrackingMessage{
+		Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
+		Body: &pb.TrackingMessage_Request{
+			Request: request,
+		},
+	})
 }
