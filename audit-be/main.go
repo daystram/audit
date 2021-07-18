@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	h.InitializeTrackerServer()
+	h.InitializeTrackerServer(config.AppConfig.TrackerServerPort)
 
 	s := &http.Server{
 		Addr:           fmt.Sprintf(":%d", config.AppConfig.Port),
