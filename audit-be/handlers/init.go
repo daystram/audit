@@ -15,8 +15,6 @@ import (
 	"github.com/daystram/audit/audit-be/models"
 )
 
-var Handler HandlerFunc
-
 type HandlerFunc interface {
 	// Application
 	ApplicationGetAll() (applicationInfos []datatransfers.ApplicationInfo, err error)
