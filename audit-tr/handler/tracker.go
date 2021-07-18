@@ -9,33 +9,38 @@ import (
 	pb "github.com/daystram/audit/proto"
 )
 
-func (m *module) SubscribeTracking() {
+func (m *module) SubscribeTracking() (err error) {
 	for {
-		message, err := m.stream.Recv()
-		if err != nil {
-			log.Fatal(err)
+		var message *pb.TrackingMessage
+		if message, err = m.stream.Recv(); err != nil {
+			return err
 		}
 		log.Println(message)
 		switch message.Code {
 		case pb.MessageType_MESSAGE_TYPE_PING:
-			m.ReplyPing(message)
+			if err = m.ReplyPing(message); err != nil {
+				return
+			}
 		case pb.MessageType_MESSAGE_TYPE_TRACKING:
-			m.ExecuteTracking(message)
+			if err = m.ExecuteTracking(message); err != nil {
+				return
+			}
 		default:
 			log.Printf("unsupported message type %s\n", message.Code.String())
 		}
 	}
 }
 
-func (m *module) ReplyPing(message *pb.TrackingMessage) {
-	m.client.Pong(context.Background(), message)
+func (m *module) ReplyPing(message *pb.TrackingMessage) (err error) {
+	_, err = m.client.Pong(context.Background(), message)
+	return
 }
 
-func (m *module) ExecuteTracking(message *pb.TrackingMessage) {
+func (m *module) ExecuteTracking(message *pb.TrackingMessage) (err error) {
 	// TODO: implement
 	request := message.Body.(*pb.TrackingMessage_Request)
 	time.Sleep(2 * time.Second) //simulate
-	m.client.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
+	_, err = m.client.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
 		Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
 		Body: &pb.TrackingMessage_Response{
 			Response: &pb.TrackingResponse{
@@ -48,4 +53,5 @@ func (m *module) ExecuteTracking(message *pb.TrackingMessage) {
 			},
 		},
 	})
+	return
 }

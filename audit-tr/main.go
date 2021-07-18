@@ -22,5 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	h.SubscribeTracking()
+	if err = h.SubscribeTracking(); err != nil {
+		log.Fatal(err)
+	}
 }
