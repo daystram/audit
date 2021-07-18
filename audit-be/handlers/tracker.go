@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"sync"
 	"time"
 
 	"google.golang.org/grpc"
@@ -15,8 +16,8 @@ import (
 
 type TrackerServer struct {
 	pb.UnimplementedTrackerServer
-	// TODO: thread safety
 	trackers map[string]*TrackerClient
+	mu       sync.RWMutex
 }
 
 type TrackerClient struct {
@@ -40,17 +41,25 @@ func (m *module) InitializeTrackerServer() {
 func (s *TrackerServer) Subscribe(request *pb.SubscriptionRequest, stream pb.Tracker_SubscribeServer) (err error) {
 	trackerID := request.TrackerId
 	// TODO: validate client
+	s.mu.Lock()
+	if _, ok := s.trackers[trackerID]; ok {
+		s.mu.Unlock()
+		return fmt.Errorf("tracker with ID %s already registered", trackerID)
+	}
 	s.trackers[trackerID] = &TrackerClient{
 		stream: stream,
 	}
-	log.Printf("[TrackerServer] %s connected\n", trackerID)
+	s.mu.Unlock()
+	log.Printf("[TrackerServer] tracker %s connected\n", trackerID)
 	s.SendTrackingRequest()
 	s.pingTracker(trackerID) // keep alive
 	return
 }
 
 func (s *TrackerServer) pingTracker(trackerID string) {
+	s.mu.RLock()
 	tracker := s.trackers[trackerID]
+	s.mu.RUnlock()
 	for {
 		err := tracker.stream.Send(&pb.TrackingMessage{
 			Code: pb.MessageType_MESSAGE_TYPE_PING,
@@ -62,7 +71,9 @@ func (s *TrackerServer) pingTracker(trackerID string) {
 			},
 		})
 		if err != nil {
+			s.mu.Lock()
 			delete(s.trackers, trackerID)
+			s.mu.Unlock()
 			log.Printf("[TrackerServer] %s disconnected. remaining trackers: %d\n", trackerID, len(s.trackers))
 			return
 		}
@@ -72,6 +83,8 @@ func (s *TrackerServer) pingTracker(trackerID string) {
 
 func (s *TrackerServer) SendTrackingRequest() {
 	// TODO: example setup; implement
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	for trackerID, tracker := range s.trackers {
 		tracker.stream.Send(&pb.TrackingMessage{
 			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
@@ -100,7 +113,9 @@ func (s *TrackerServer) Pong(ctx context.Context, message *pb.TrackingMessage) (
 	trackerID := request.TrackerId
 	latency := time.Now().UnixNano() - request.RequestedAt
 	log.Printf("[TrackerServer] latency to %s: %dms", trackerID, latency/10e6)
+	s.mu.RLock()
 	s.trackers[trackerID].lastPinged = time.Now().Unix()
 	s.trackers[trackerID].latency = latency
+	s.mu.RUnlock()
 	return &pb.Empty{}, nil
 }
