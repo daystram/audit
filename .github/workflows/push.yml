@@ -4,14 +4,30 @@ jobs:
   lint-be:
     name: Lint audit-be
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: audit-be
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
+      - name: Generate Files
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
+          make -C ..
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
           working-directory: audit-be
+          skip-go-installation: true
+          skip-pkg-cache: true
   build-be:
     name: Build audit-be
     runs-on: Ubuntu-20.04
@@ -25,6 +41,13 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: "^1.16"
+      - name: Generate Files
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
+          make -C ..
       - name: Install Dependencies
         run: go mod tidy
       - name: Build
@@ -32,7 +55,7 @@ jobs:
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: be-build
+          name: build-be
           path: |
             audit-be/app
   test-be:
@@ -49,6 +72,13 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: "^1.16"
+      - name: Generate Files
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
+          make -C ..
       - name: Install Dependencies
         run: go mod tidy
       - name: Test
@@ -88,13 +118,99 @@ jobs:
         with:
           node-version: 12.x
       - name: Install Dependencies
-        run: yarn install
+        run: yarn install --frozen-lockfile
       - name: Build
         run: yarn build
       - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: fe-build
+          name: build-fe
           path: |
             audit-fe/dist/
             audit-fe/stats.html
+  lint-tr:
+    name: Lint audit-tr
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: audit-tr
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
+      - name: Generate Files
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
+          make -C ..
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: latest
+          working-directory: audit-tr
+          skip-go-installation: true
+          skip-pkg-cache: true
+  build-tr:
+    name: Build audit-tr
+    runs-on: Ubuntu-20.04
+    defaults:
+      run:
+        working-directory: audit-tr
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
+      - name: Generate Files
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
+          make -C ..
+      - name: Install Dependencies
+        run: go mod tidy
+      - name: Build
+        run: go build -o app .
+      - name: Archive Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-tr
+          path: |
+            audit-tr/app
+  test-tr:
+    name: Test audit-tr
+    runs-on: Ubuntu-20.04
+    needs: [build-tr]
+    defaults:
+      run:
+        working-directory: audit-tr
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: "^1.16"
+      - name: Generate Files
+        run: |
+          sudo apt install -y protobuf-compiler
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+          go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+          go install github.com/golang/mock/mockgen@v1.6
+          make -C ..
+      - name: Install Dependencies
+        run: go mod tidy
+      - name: Test
+        run: go test ./... -v -coverprofile=coverage.txt
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          flags: audit-tr

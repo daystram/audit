@@ -51,7 +51,7 @@ func (suite *HandlerServiceTestSuite) TestServiceGetAll() {
 	})
 }
 
-func (suite *HandlerServiceTestSuite) TestApplicationGetOne() {
+func (suite *HandlerServiceTestSuite) TestServiceGetOne() {
 	suite.T().Run("service exists", func(t *testing.T) {
 		suite.MockServiceOrmer.EXPECT().GetOneByIDAndApplicationID("service_id", "app_id").Return(models.Service{
 			ID:            "service_id",
@@ -76,7 +76,7 @@ func (suite *HandlerServiceTestSuite) TestApplicationGetOne() {
 	})
 }
 
-func (suite *HandlerServiceTestSuite) TestApplicationCreate() {
+func (suite *HandlerServiceTestSuite) TestServiceCreate() {
 	suite.T().Run("create", func(t *testing.T) {
 		suite.MockServiceOrmer.EXPECT().Insert(gomock.Any()).Return("app_id", nil)
 		serviceID, err := suite.Handler.ServiceCreate(datatransfers.ServiceInfo{
@@ -99,7 +99,7 @@ func (suite *HandlerServiceTestSuite) TestApplicationCreate() {
 	})
 }
 
-func (suite *HandlerServiceTestSuite) TestApplicationUpdate() {
+func (suite *HandlerServiceTestSuite) TestServiceUpdate() {
 	suite.T().Run("create", func(t *testing.T) {
 		suite.MockServiceOrmer.EXPECT().Update(gomock.Any()).Return(nil)
 		err := suite.Handler.ServiceUpdate(datatransfers.ServiceInfo{
@@ -122,7 +122,7 @@ func (suite *HandlerServiceTestSuite) TestApplicationUpdate() {
 	})
 }
 
-func (suite *HandlerServiceTestSuite) TestApplicationDelete() {
+func (suite *HandlerServiceTestSuite) TestServiceDelete() {
 	suite.T().Run("delete", func(t *testing.T) {
 		suite.MockServiceOrmer.EXPECT().DeleteByIDAndApplicationID("service_id", "app_id").Return(nil)
 		err := suite.Handler.ServiceDelete("service_id", "app_id")

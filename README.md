@@ -22,10 +22,25 @@ The application comes in two parts:
 
 | Name      |  Code Name  | Stack                                                                                                                                                                               |
 | --------- | :---------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Back-end  | `audit-be` | [Go](https://golang.org/), [Gin](https://github.com/gin-gonic/gin) + [Gorm](https://github.com/go-gorm/gorm), [InfluxDB](https://www.influxdata.com/), [PostgreSQL](https://www.postgresql.org/) |
+| Back-end  | `audit-be` | [Go](https://golang.org/), [Gin](https://github.com/gin-gonic/gin) + [Gorm](https://github.com/go-gorm/gorm), [gRPC](https://grpc.io), [InfluxDB](https://www.influxdata.com/), [PostgreSQL](https://www.postgresql.org/) |
+| Tracker  | `audit-tr` | [Go](https://golang.org/), [gRPC](https://grpc.io) |
 | Front-end | `audit-fe` | [TypeScript](https://www.typescriptlang.org/), [Vue.js](https://vuejs.org/)                                                                                                         |
 
 ## Develop
+
+### Generate Protobuf and Mocks
+The project relies on some parts of the code being generated, notably the protocol buffers and the mocks used for testing. To generate these files, install [protoc](https://grpc.io/docs/protoc-installation) and [mockgen](https://github.com/golang/mock). Then run the target on the Makefile.
+
+Install the Go and Go gRPC plugin for protoc:
+```shell
+$ go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27
+$ go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1
+```
+
+Generate the files:
+```shell
+$ make all
+```
 
 ### audit-be
 
@@ -37,6 +52,18 @@ To begin developing, simply enter the sub-directory and run the development serv
 $ cd audit-be
 $ go mod tidy
 $ air
+```
+
+### audit-tr
+
+Populate `.env.development` with the required credentials.
+
+To begin developing, simply enter the sub-director and run the development server:
+
+```shell
+$ cd audit-fe
+$ yarn
+$ yarn serve
 ```
 
 ### audit-fe

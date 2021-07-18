@@ -1,0 +1,62 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "github.com/daystram/audit/proto";
+
+enum MessageType {
+  MESSAGE_TYPE_ERROR = 0;
+  MESSAGE_TYPE_PING = 1;
+  MESSAGE_TYPE_TRACKING = 2;
+}
+
+enum ServiceType {
+  SERVICE_TYPE_UNKNOWN = 0;
+  SERVICE_TYPE_HTTP = 1;
+  SERVICE_TYPE_TCP = 2;
+  SERVICE_TYPE_UDP = 3;
+}
+
+enum ServiceStatus {
+  SERVICE_STATUS_UNKNOWN = 0;
+  SERVICE_STATUS_UP = 1;
+  SERVICE_STATUS_UNREACHABLE = 2;
+}
+
+message TrackingMessage {
+  MessageType code = 1;
+  oneof Body {
+    TrackingRequest request = 2;
+    TrackingResponse response = 3;
+  }
+}
+
+message TrackingRequest {
+  string application_id = 1;
+  string service_id = 2;
+  string tracker_id = 3;
+  string endpoint = 4;
+  ServiceType type = 5;
+  string config = 6;
+  int64 requestedAt = 7;
+}
+
+message TrackingResponse {
+  string application_id = 1;
+  string service_id = 2;
+  string tracker_id = 3;
+  ServiceStatus status = 4;
+  int32 response_time = 5;
+  int64 executedAt = 6;
+}
+
+message SubscriptionRequest {
+  string tracker_id = 1;
+}
+
+message Empty {}
+
+service Tracker {
+  rpc Subscribe(SubscriptionRequest) returns (stream TrackingMessage) {}
+  rpc ReportTrackingRequest(TrackingMessage) returns (Empty) {}
+  rpc Pong(TrackingMessage) returns (Empty) {}
+}
