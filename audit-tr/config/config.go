@@ -11,7 +11,6 @@ var AppConfig Config
 type Config struct {
 	TrackerServer string
 	TrackerID     string
-	TrackerKey    string
 }
 
 func InitializeAppConfig() {
@@ -24,9 +23,8 @@ func InitializeAppConfig() {
 	viper.AutomaticEnv()
 	_ = viper.ReadInConfig()
 
-	AppConfig.TrackerServer = viper.GetInt("TRACKER_SERVER")
+	AppConfig.TrackerServer = viper.GetString("TRACKER_SERVER")
 	AppConfig.TrackerID = viper.GetString("TRACKER_ID")
-	AppConfig.TrackerKey = viper.GetBool("TRACKER_KEY")
 
 	log.Printf("[INIT] Configuration loaded!")
 }
