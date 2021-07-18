@@ -1,6 +1,7 @@
 FROM daystram/go-builder:1.16 as builder
 WORKDIR /build
-COPY audit-be audit-tr
+COPY audit-tr audit-tr
+COPY audit-be audit-be
 COPY proto proto
 COPY Makefile .
 RUN make
