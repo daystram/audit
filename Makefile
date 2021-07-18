@@ -8,11 +8,11 @@ build_proto:
 
 generate_audit-be_mock:
 	@echo "Generating audit-be mocks..."
-	@cd audit-be && find handlers models -type f ! -name "*_test*" | xargs -L1 -I{}  sh -c 'OUT=mocks/$${1} && mkdir -p $${OUT%/*} && touch $${OUT} && mockgen --source $${1} > $${OUT} && echo $$OUT' -- {}
+	@cd audit-be && find handlers models -type f ! -name "*_test*" | xargs -L1 -I{}  sh -c 'OUT=mocks/$${1} && mkdir -p $${OUT%/*} && touch $${OUT} && mockgen --source $${1} > $${OUT} && echo - $${OUT}' -- {}
 
 generate_proto_mock:
 	@echo "Generating proto mocks..."
-	@cd proto && find . -type f -name "*.go" | xargs -L1 -I{}  sh -c 'OUT=mocks/$${1} && mkdir -p $${OUT%/*} && touch $${OUT} && mockgen --source $${1} > $${OUT}' -- {}
+	@cd proto && find . -type f -name "*.go" | xargs -L1 -I{}  sh -c 'OUT=mocks/$${1#./} && mkdir -p $${OUT%/*} && touch $${OUT} && mockgen --source $${1} > $${OUT} && echo - $${OUT}' -- {}
 
 clean:
 	rm -f proto/*.go
