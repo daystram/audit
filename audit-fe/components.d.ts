@@ -4,11 +4,13 @@
 declare module 'vue' {
   export interface GlobalComponents {
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    Logo: typeof import('./src/components/Logo.vue')['default']
     VApp: typeof import('vuetify/lib')['VApp']
     VAppBar: typeof import('vuetify/lib')['VAppBar']
     VBtn: typeof import('vuetify/lib')['VBtn']
     VCol: typeof import('vuetify/lib')['VCol']
     VContainer: typeof import('vuetify/lib')['VContainer']
+    VIcon: typeof import('vuetify/lib')['VIcon']
     VImg: typeof import('vuetify/lib')['VImg']
     VMain: typeof import('vuetify/lib')['VMain']
     VRow: typeof import('vuetify/lib')['VRow']
