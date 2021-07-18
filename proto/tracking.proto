@@ -33,18 +33,20 @@ message TrackingMessage {
 message TrackingRequest {
   string application_id = 1;
   string service_id = 2;
-  string endpoint = 3;
-  ServiceType type = 4;
-  string config = 5;
-  int32 requestedAt = 6;
+  string tracker_id = 3;
+  string endpoint = 4;
+  ServiceType type = 5;
+  string config = 6;
+  int64 requestedAt = 7;
 }
 
 message TrackingResponse {
   string application_id = 1;
   string service_id = 2;
-  ServiceStatus status = 3;
-  int32 response_time = 4;
-  int32 executedAt = 5;
+  string tracker_id = 3;
+  ServiceStatus status = 4;
+  int32 response_time = 5;
+  int64 executedAt = 6;
 }
 
 message SubscriptionRequest {
@@ -55,5 +57,6 @@ message Empty {}
 
 service Tracker {
   rpc Subscribe(SubscriptionRequest) returns (stream TrackingMessage) {}
-  rpc Report(TrackingMessage) returns (Empty) {}
+  rpc ReportTrackingRequest(TrackingMessage) returns (Empty) {}
+  rpc Pong(TrackingMessage) returns (Empty) {}
 }
