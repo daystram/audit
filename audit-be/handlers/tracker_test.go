@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"errors"
-	"sync"
 	"testing"
 	"time"
 
@@ -20,23 +19,25 @@ type HandlerTrackerTestSuite struct {
 	Handler *module
 }
 
-func (suite *HandlerTrackerTestSuite) SetupTest() {
+func (suite *HandlerTrackerTestSuite) SetupTest(trackers map[string]TrackerClient) {
 	suite.Handler = &module{
-		trackerServer: &TrackerServer{
-			trackers: map[string]*TrackerClient{},
-			mu:       sync.RWMutex{},
+		trackerServer: &trackerServerModule{
+			trackers: trackers,
 		},
 	}
 }
 
 func (suite *HandlerTrackerTestSuite) TestInitializeTrackerServer() {
 	suite.T().Run("starts", func(t *testing.T) {
-		suite.Handler.InitializeTrackerServer(9999)
+		suite.SetupTest(make(map[string]TrackerClient))
+		suite.Handler.InitializeTrackerServer(7899)
 	})
 }
 
 func (suite *HandlerTrackerTestSuite) TestSubscribe() {
 	suite.T().Run("registers", func(t *testing.T) {
+		trackers := make(map[string]TrackerClient)
+		suite.SetupTest(trackers)
 		ctrl := gomock.NewController(suite.T())
 		defer ctrl.Finish()
 		mockStream := mock_pb.NewMockTracker_SubscribeServer(ctrl)
@@ -45,24 +46,28 @@ func (suite *HandlerTrackerTestSuite) TestSubscribe() {
 		err := suite.Handler.trackerServer.Subscribe(&pb.SubscriptionRequest{
 			TrackerId: "tracker_id",
 		}, mockStream)
-		assert.Empty(suite.T(), suite.Handler.trackerServer.trackers)
+		assert.Empty(suite.T(), trackers)
 		assert.NotNil(suite.T(), err)
 	})
 	suite.T().Run("already exists", func(t *testing.T) {
+		trackers := make(map[string]TrackerClient)
+		suite.SetupTest(trackers)
 		ctrl := gomock.NewController(suite.T())
 		defer ctrl.Finish()
-		suite.Handler.trackerServer.trackers["tracker_id"] = &TrackerClient{}
+		trackers["tracker_id"] = &trackerClientEntity{}
 		mockStream := mock_pb.NewMockTracker_SubscribeServer(ctrl)
 		err := suite.Handler.trackerServer.Subscribe(&pb.SubscriptionRequest{
 			TrackerId: "tracker_id",
 		}, mockStream)
-		assert.Len(suite.T(), suite.Handler.trackerServer.trackers, 1)
+		assert.Len(suite.T(), trackers, 1)
 		assert.NotNil(suite.T(), err)
 	})
 }
 
 func (suite *HandlerTrackerTestSuite) TestSendTrackingRequest() {
 	suite.T().Run("runs", func(t *testing.T) {
+		trackers := make(map[string]TrackerClient)
+		suite.SetupTest(trackers)
 		ctrl := gomock.NewController(suite.T())
 		defer ctrl.Finish()
 		mockStream := mock_pb.NewMockTracker_SubscribeServer(ctrl)
@@ -77,22 +82,36 @@ func (suite *HandlerTrackerTestSuite) TestSendTrackingRequest() {
 				},
 			},
 		}).Times(1)
-		suite.Handler.trackerServer.trackers["tracker_id"] = &TrackerClient{
+		trackers["tracker_id"] = &trackerClientEntity{
 			stream: mockStream,
 		}
-		suite.Handler.trackerServer.SendTrackingRequest(&pb.TrackingRequest{
+		err := suite.Handler.trackerServer.SendTrackingRequest(&pb.TrackingRequest{
 			ApplicationId: "app_id",
 			ServiceId:     "service_id",
 			TrackerId:     "tracker_id",
 			Endpoint:      "service.daystram.com:80",
 		})
+		assert.Nil(suite.T(), err)
+	})
+	suite.T().Run("unregistered", func(t *testing.T) {
+		trackers := make(map[string]TrackerClient)
+		suite.SetupTest(trackers)
+		err := suite.Handler.trackerServer.SendTrackingRequest(&pb.TrackingRequest{
+			ApplicationId: "app_id",
+			ServiceId:     "service_id",
+			TrackerId:     "tracker_id",
+			Endpoint:      "service.daystram.com:80",
+		})
+		assert.NotNil(suite.T(), err)
 	})
 }
 
 func (suite *HandlerTrackerTestSuite) TestReportTrackingRequest() {
 	suite.T().Run("runs", func(t *testing.T) {
-		suite.Handler.trackerServer.trackers["tracker_id"] = &TrackerClient{}
-		suite.Handler.trackerServer.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
+		trackers := make(map[string]TrackerClient)
+		suite.SetupTest(trackers)
+		trackers["tracker_id"] = &trackerClientEntity{}
+		_, err := suite.Handler.trackerServer.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
 			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
 			Body: &pb.TrackingMessage_Response{
 				Response: &pb.TrackingResponse{
@@ -102,27 +121,45 @@ func (suite *HandlerTrackerTestSuite) TestReportTrackingRequest() {
 				},
 			},
 		})
+		assert.Nil(suite.T(), err)
 	})
 }
 
 func (suite *HandlerTrackerTestSuite) TestPong() {
 	suite.T().Run("runs", func(t *testing.T) {
-		now := time.Now().Add(-time.Second)
-		suite.Handler.trackerServer.trackers["tracker_id"] = &TrackerClient{
-			lastPinged: 0,
-			latency:    0,
+		trackers := make(map[string]TrackerClient)
+		suite.SetupTest(trackers)
+		trackers["tracker_id"] = &trackerClientEntity{
+			lastPinged: -1,
+			latency:    -1,
 		}
-		suite.Handler.trackerServer.Pong(context.Background(), &pb.TrackingMessage{
+		_, err := suite.Handler.trackerServer.Pong(context.Background(), &pb.TrackingMessage{
 			Code: pb.MessageType_MESSAGE_TYPE_PING,
 			Body: &pb.TrackingMessage_Request{
 				Request: &pb.TrackingRequest{
 					TrackerId:   "tracker_id",
-					RequestedAt: now.UnixNano(),
+					RequestedAt: time.Now().Add(-time.Second).UnixNano(),
 				},
 			},
 		})
-		assert.NotZero(suite.T(), suite.Handler.trackerServer.trackers["tracker_id"].lastPinged)
-		assert.InEpsilon(suite.T(), time.Second, suite.Handler.trackerServer.trackers["tracker_id"].latency, 1e-3)
+		lastPinged, latency := trackers["tracker_id"].Status()
+		assert.Nil(suite.T(), err)
+		assert.NotEqual(suite.T(), -1, lastPinged)
+		assert.InEpsilon(suite.T(), time.Second, latency, 1e-3)
+	})
+	suite.T().Run("unregistered", func(t *testing.T) {
+		trackers := make(map[string]TrackerClient)
+		suite.SetupTest(trackers)
+		_, err := suite.Handler.trackerServer.Pong(context.Background(), &pb.TrackingMessage{
+			Code: pb.MessageType_MESSAGE_TYPE_PING,
+			Body: &pb.TrackingMessage_Request{
+				Request: &pb.TrackingRequest{
+					TrackerId:   "tracker_id",
+					RequestedAt: time.Now().Add(-time.Second).UnixNano(),
+				},
+			},
+		})
+		assert.NotNil(suite.T(), err)
 	})
 }
 
