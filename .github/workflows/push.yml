@@ -25,6 +25,7 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
+          working-directory: audit-be
           skip-go-installation: true
           skip-pkg-cache: true
   build-be:
@@ -151,6 +152,7 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
+          working-directory: audit-tr
           skip-go-installation: true
           skip-pkg-cache: true
   build-tr:
