@@ -37,6 +37,9 @@
         </v-btn>
       </v-row>
     </v-col>
+    <div class="app-version text-overline text--disabled">
+      {{ appVersion || "" }}
+    </div>
   </v-container>
 </template>
 
@@ -46,6 +49,11 @@ import Logo from "@/components/Logo.vue";
 export default Vue.extend({
   components: {
     Logo,
+  },
+  data() {
+    return {
+      appVersion: import.meta.env.VITE_APP_VERSION,
+    };
   },
   computed: {
     isAuthenticated() {
