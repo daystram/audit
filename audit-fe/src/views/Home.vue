@@ -15,7 +15,7 @@
       </v-row>
       <v-row align="center" justify="center" class="mt-0">
         <v-btn
-          :to="{ name: 'dashboard' }"
+          :to="{ name: 'dashboard:monitor' }"
           elevation="6"
           rounded
           x-large

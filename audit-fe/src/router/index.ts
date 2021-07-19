@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import { Home } from "@/views";
+import { Dashboard, Home, Incidents, Monitor } from "@/views";
 
 Vue.use(VueRouter);
 
@@ -12,6 +12,28 @@ const routes: Array<RouteConfig> = [
     meta: {
       title: "Audit",
     },
+  },
+  {
+    path: "/",
+    component: Dashboard,
+    children: [
+      {
+        path: "monitor",
+        name: "dashboard:monitor",
+        component: Monitor,
+        meta: {
+          title: "Monitor | Audit",
+        },
+      },
+      {
+        path: "incidents",
+        name: "dashboard:incidents",
+        component: Incidents,
+        meta: {
+          title: "Incidents | Audit",
+        },
+      },
+    ],
   },
 ];
 
