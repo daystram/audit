@@ -4,6 +4,8 @@ import "./registerServiceWorker";
 import router from "./router";
 import vuetify from "./plugins/vuetify";
 
+import "@/styles/App.sass";
+
 Vue.config.productionTip = false;
 
 new Vue({
