@@ -16,7 +16,7 @@
       </h1>
       <v-spacer />
       <v-menu
-        v-if="user"
+        v-if="isAuthenticated"
         right
         nudge-bottom="12px"
         offset-y
@@ -106,6 +106,7 @@
 <script lang="ts">
 import Vue from "vue";
 import Logo from "@/components/Logo.vue";
+import { authManager } from "@/auth";
 export default Vue.extend({
   components: { Logo },
   data: (): {
@@ -116,14 +117,8 @@ export default Vue.extend({
     };
   },
   computed: {
-    user: () => ({
-      sub: "",
-      given_name: "",
-      family_name: "",
-      preferred_username: "",
-      is_superuser: false,
-      created_at: 0,
-    }),
+    isAuthenticated: () => authManager.isAuthenticated(),
+    user: () => authManager.getUser(),
   },
 });
 </script>

@@ -1,6 +1,7 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import { Dashboard, Home, Incidents, Monitor } from "@/views";
+import { authenticatedOnly, callback, login, logout, unAuthenticatedOnly } from "@/auth";
 
 Vue.use(VueRouter);
 
@@ -34,6 +35,28 @@ const routes: Array<RouteConfig> = [
         },
       },
     ],
+  },
+  {
+    path: "/login",
+    name: "login",
+    beforeEnter: unAuthenticatedOnly,
+    component: login,
+  },
+  {
+    path: "/logout",
+    name: "logout",
+    beforeEnter: authenticatedOnly,
+    component: logout,
+  },
+  {
+    path: "/callback",
+    name: "callback",
+    beforeEnter: unAuthenticatedOnly,
+    component: callback,
+  },
+  {
+    path: "*",
+    redirect: { name: "home" },
   },
 ];
 
