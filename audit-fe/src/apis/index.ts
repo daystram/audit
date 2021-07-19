@@ -2,7 +2,7 @@ import axios, { AxiosInstance, AxiosResponse } from "axios";
 import { ACCESS_TOKEN } from "@daystram/ratify-client";
 import { authManager, refreshAuth } from "@/auth";
 import router from "@/router";
-import { ApplicationInfo } from "./datatransfers";
+import { ApplicationInfo, ServiceInfo } from "./datatransfers";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: `${
@@ -30,20 +30,66 @@ const withAuth = () => ({
 
 export default {
   application: {
-    get: function (id: string): Promise<Response> {
+    list: function (): Promise<AxiosResponse> {
+      return apiClient.get(`application/`);
+    },
+    get: function (id: string): Promise<AxiosResponse> {
       return apiClient.get(`application/${id}`);
     },
-    list: function (): Promise<AxiosResponse> {
-      return apiClient.get(`application/list`);
+    create: function (
+      applicationInfo: ApplicationInfo
+    ): Promise<AxiosResponse> {
+      return apiClient.post(`application/`, applicationInfo);
     },
-    create: function (application: ApplicationInfo): Promise<AxiosResponse> {
-      return apiClient.post(`application`, application);
+    update: function (
+      applicationInfo: ApplicationInfo
+    ): Promise<AxiosResponse> {
+      return apiClient.put(
+        `application/${applicationInfo.id}`,
+        applicationInfo
+      );
     },
-    update: function (application: ApplicationInfo): Promise<AxiosResponse> {
-      return apiClient.put(`application/${application.id}`, application);
+    delete: function (applicationId: string): Promise<AxiosResponse> {
+      return apiClient.delete(`application/${applicationId}`);
     },
-    delete: function (hash: string): Promise<AxiosResponse> {
-      return apiClient.delete(`application/${hash}`);
+    service: {
+      list: function (applicationId: string): Promise<AxiosResponse> {
+        return apiClient.get(`application/${applicationId}/service/`);
+      },
+      get: function (
+        applicationId: string,
+        serviceId: string
+      ): Promise<AxiosResponse> {
+        return apiClient.get(
+          `application/${applicationId}/service/${serviceId}`
+        );
+      },
+      create: function (
+        applicationId: string,
+        serviceInfo: ServiceInfo
+      ): Promise<AxiosResponse> {
+        return apiClient.post(
+          `application/${applicationId}/service/`,
+          serviceInfo
+        );
+      },
+      update: function (
+        applicationId: string,
+        serviceInfo: ServiceInfo
+      ): Promise<AxiosResponse> {
+        return apiClient.put(
+          `application/${applicationId}/service/${serviceInfo.id}`,
+          serviceInfo
+        );
+      },
+      delete: function (
+        applicationId: string,
+        serviceId: string
+      ): Promise<AxiosResponse> {
+        return apiClient.delete(
+          `application/${applicationId}/service/${serviceId}`
+        );
+      },
     },
   },
 };
