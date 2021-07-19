@@ -74,7 +74,7 @@
         color="primary darken-2"
       />
     </v-app-bar>
-    <v-navigation-drawer v-if="user" app clipped v-model="drawer">
+    <v-navigation-drawer app clipped v-model="drawer">
       <v-list nav dense rounded>
         <v-list-item-group color="primary">
           <v-list-item :to="{ name: 'dashboard:monitor' }">
@@ -115,14 +115,14 @@ export default Vue.extend({
     };
   },
   computed: {
-    user: () => ({
-      sub: "USER_ID",
-      given_name: "Test",
-      family_name: "User",
-      preferred_username: "Test",
-      is_superuser: false,
-      created_at: 0,
-    }),
+    // user: () => ({
+    //   sub: "USER_ID",
+    //   given_name: "Test",
+    //   family_name: "User",
+    //   preferred_username: "Test",
+    //   is_superuser: false,
+    //   created_at: 0,
+    // }),
   },
 });
 </script>
