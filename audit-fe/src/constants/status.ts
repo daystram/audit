@@ -6,9 +6,3 @@ export enum STATUS {
   ERROR = "ERROR",
   BAD_REQUEST = "BAD_REQUEST",
 }
-
-export const StatusMixin = {
-  data: () => ({
-    STATUS,
-  }),
-};

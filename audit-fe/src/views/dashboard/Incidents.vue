@@ -45,6 +45,7 @@ import { STATUS } from "@/constants";
 export default Vue.extend({
   data() {
     return {
+      STATUS,
       pageLoadStatus: STATUS.PRE_LOADING,
     };
   },

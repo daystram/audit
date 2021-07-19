@@ -3,7 +3,6 @@
 
 declare module 'vue' {
   export interface GlobalComponents {
-    HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     Logo: typeof import('./src/components/Logo.vue')['default']
     VAlert: typeof import('vuetify/lib')['VAlert']
     VApp: typeof import('vuetify/lib')['VApp']
@@ -11,18 +10,11 @@ declare module 'vue' {
     VAppBarNavIcon: typeof import('vuetify/lib')['VAppBarNavIcon']
     VAvatar: typeof import('vuetify/lib')['VAvatar']
     VBtn: typeof import('vuetify/lib')['VBtn']
-    VBtnToggle: typeof import('vuetify/lib')['VBtnToggle']
-    VCard: typeof import('vuetify/lib')['VCard']
-    VCardTitle: typeof import('vuetify/lib')['VCardTitle']
-    VChip: typeof import('vuetify/lib')['VChip']
     VCol: typeof import('vuetify/lib')['VCol']
     VContainer: typeof import('vuetify/lib')['VContainer']
-    VDataTable: typeof import('vuetify/lib')['VDataTable']
-    VDivider: typeof import('vuetify/lib')['VDivider']
     VExpandTransition: typeof import('vuetify/lib')['VExpandTransition']
     VFadeTransition: typeof import('vuetify/lib')['VFadeTransition']
     VIcon: typeof import('vuetify/lib')['VIcon']
-    VImg: typeof import('vuetify/lib')['VImg']
     VList: typeof import('vuetify/lib')['VList']
     VListItem: typeof import('vuetify/lib')['VListItem']
     VListItemAvatar: typeof import('vuetify/lib')['VListItemAvatar']
@@ -38,7 +30,6 @@ declare module 'vue' {
     VProgressCircular: typeof import('vuetify/lib')['VProgressCircular']
     VRow: typeof import('vuetify/lib')['VRow']
     VSpacer: typeof import('vuetify/lib')['VSpacer']
-    VTextField: typeof import('vuetify/lib')['VTextField']
   }
 }
 

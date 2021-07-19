@@ -2,7 +2,6 @@
   <div class="manage fill-height">
     <v-app-bar app clipped-left>
       <v-app-bar-nav-icon
-        v-if="user"
         class="hidden-lg-and-up"
         @click.stop="drawer = !drawer"
       />
@@ -104,25 +103,27 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import Vue from "vue";
 import Logo from "@/components/Logo.vue";
 export default Vue.extend({
   components: { Logo },
-  data() {
+  data: (): {
+    drawer: boolean | null;
+  } => {
     return {
       drawer: null,
     };
   },
   computed: {
-    // user: () => ({
-    //   sub: "USER_ID",
-    //   given_name: "Test",
-    //   family_name: "User",
-    //   preferred_username: "Test",
-    //   is_superuser: false,
-    //   created_at: 0,
-    // }),
+    user: () => ({
+      sub: "USER_ID",
+      given_name: "Test",
+      family_name: "User",
+      preferred_username: "Test",
+      is_superuser: false,
+      created_at: 0,
+    }),
   },
 });
 </script>
