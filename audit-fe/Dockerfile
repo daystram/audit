@@ -4,6 +4,8 @@ COPY audit-fe audit-fe
 WORKDIR /build/audit-fe
 RUN yarn install --frozen-lockfile
 RUN yarn build --mode production
+RUN pwd
+RUN ls -al
 RUN cat .env.production
 
 FROM nginx:stable-alpine as production

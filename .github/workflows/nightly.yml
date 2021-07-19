@@ -35,7 +35,6 @@ jobs:
           ls -al
           pwd
           ls -al audit-fe
-          ls ${{ env.APPLICATION }}-${{ matrix.service }}
       - name: Build and Push Image
         uses: docker/build-push-action@v2
         with:
