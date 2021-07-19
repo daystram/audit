@@ -116,14 +116,7 @@ export default Vue.extend({
     };
   },
   computed: {
-    user: () => ({
-      sub: "USER_ID",
-      given_name: "Test",
-      family_name: "User",
-      preferred_username: "Test",
-      is_superuser: false,
-      created_at: 0,
-    }),
+    user: () => undefined,
   },
 });
 </script>
