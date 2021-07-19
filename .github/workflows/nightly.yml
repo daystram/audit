@@ -29,9 +29,12 @@ jobs:
         run: echo "RELEASE_VERSION=v0.0.0-development" >> $GITHUB_ENV
       - name: Provide Env File
         run: |
-          ls
           echo "${{ secrets.FE_ENV_FILE }}" > ${{ env.APPLICATION }}-${{ matrix.service }}/.env.production
           echo "VITE_APP_VERSION=${{ env.RELEASE_VERSION }}" >> ${{ env.APPLICATION }}-${{ matrix.service }}/.env.production
+          pwd
+          ls -al
+          pwd
+          ls -al audit-fe
           ls ${{ env.APPLICATION }}-${{ matrix.service }}
       - name: Build and Push Image
         uses: docker/build-push-action@v2
