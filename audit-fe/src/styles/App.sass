@@ -36,10 +36,10 @@ h1
   line-height: normal !important
 
 .v-card > .v-card__title
-  padding: 16px 16px 16px 24px !important
+  padding: 16px 24px 16px 24px !important
 
 .v-card > .v-card__subtitle
-  padding: 16px 16px 16px 24px !important
+  padding: 16px 24px 16px 24px !important
 
 .v-card > .v-card__text
   padding: 16px 24px 24px 24px
@@ -50,13 +50,19 @@ h1
 .v-expansion-panel
   border-style: solid
   border-color: rgba(255, 255, 255, 0.12)
+  border-width: 0px 1px 1px 1px
+
+.v-expansion-panel:first-child
   border-width: 1px
 
-.v-expansion-panel:not(:first-child):not(.v-item--active)
-  border-width: 0 1px 1px 1px
+.v-expansion-panel.v-expansion-panel--active + .v-expansion-panel
+  border-width: 1px
+
+.v-expansion-panel.v-item--active
+  border-width: 1px
 
 .v-expansion-panel:not(:first-child)::after
-  border-style: none
+  border-top: none !important
 
 code
   vertical-align: middle !important
