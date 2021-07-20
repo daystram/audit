@@ -231,6 +231,9 @@
                 </v-col>
               </v-card-text>
             </v-card>
+            <div class="text--disabled" v-if="!applications.length">
+              No registered applications
+            </div>
           </v-col>
         </v-row>
       </div>
