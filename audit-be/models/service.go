@@ -13,7 +13,7 @@ type Service struct {
 	Name        string `gorm:"column:name;type:varchar(20);not null" json:"-"`
 	Description string `gorm:"column:description;type:varchar(50)" json:"-"`
 	Endpoint    string `gorm:"column:endpoint;type:varchar(50)" json:"-"`
-	Type        string `gorm:"column:type;type:char(5)" json:"-"`
+	Type        string `gorm:"column:type;type:varchar(5)" json:"-"`
 	Config      string `gorm:"column:config;type:text" json:"-"`
 	Showcase    bool   `gorm:"column:showcase;default:false" json:"-"`
 
@@ -54,7 +54,17 @@ func (o *serviceOrm) Insert(service Service) (ID string, err error) {
 }
 
 func (o *serviceOrm) Update(service Service) (err error) {
-	result := o.db.Model(&Service{}).Where("id = ? AND application_id = ?", service.ID, service.ApplicationID).Updates(&service)
+
+	result := o.db.Model(&Service{}).Where("id = ? AND application_id = ?", service.ID, service.ApplicationID).Select(
+		"Name",
+		"Description",
+		"Endpoint",
+		"Type",
+		"Config",
+		"Showcase",
+		"CreatedAt",
+		"UpdatedAt",
+	).Updates(&service)
 	return result.Error
 }
 
