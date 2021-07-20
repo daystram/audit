@@ -5,104 +5,9 @@
         <h1 class="text-h2">Manage</h1>
       </v-col>
       <v-col cols="auto">
-        <v-dialog
-          v-model="create.creating"
-          width="546"
-          persistent
-          overlay-opacity="0"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="primary darken-2"
-              rounded
-              v-bind="attrs"
-              v-on="on"
-              @click="resetCreate"
-            >
-              New Application
-            </v-btn>
-          </template>
-          <v-card :loading="create.formLoadStatus === STATUS.LOADING">
-            <v-card-title>
-              <v-row no-gutters align="center">
-                <v-col cols="auto"> New Application </v-col>
-                <v-spacer />
-                <v-col cols="auto">
-                  <v-btn
-                    v-if="
-                      create.formLoadStatus === STATUS.IDLE ||
-                      create.formLoadStatus === STATUS.ERROR
-                    "
-                    text
-                    rounded
-                    color="error"
-                    @click="
-                      () => {
-                        cancelCreate();
-                      }
-                    "
-                  >
-                    Cancel
-                  </v-btn>
-                  <v-btn
-                    text
-                    rounded
-                    class="ml-4"
-                    color="success"
-                    :disabled="create.formLoadStatus === STATUS.LOADING"
-                    @click="confirmCreate"
-                  >
-                    <div v-if="create.formLoadStatus !== STATUS.LOADING">
-                      Create
-                    </div>
-                    <div v-else>Creating</div>
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-card-title>
-            <v-divider inset />
-            <v-card-text class="pt-4">
-              <v-expand-transition>
-                <div v-show="create.formLoadStatus === STATUS.ERROR">
-                  <v-alert
-                    type="error"
-                    text
-                    dense
-                    transition="scroll-y-transition"
-                  >
-                    Failed creating application!
-                  </v-alert>
-                </div>
-              </v-expand-transition>
-              <v-row>
-                <v-col cols="12">
-                  <v-text-field
-                    v-model.trim="create.application.name"
-                    :error-messages="createNameErrors"
-                    :counter="20"
-                    label="Name"
-                    required
-                    :disabled="create.formLoadStatus === STATUS.LOADING"
-                    @input="$v.create.application.name.$touch()"
-                    @blur="$v.create.application.name.$touch()"
-                    :prepend-icon="'mdi-application'"
-                  />
-                  <v-text-field
-                    v-model.trim="create.application.description"
-                    :error-messages="createDescriptionErrors"
-                    :counter="50"
-                    label="Description"
-                    required
-                    :disabled="create.formLoadStatus === STATUS.LOADING"
-                    @input="$v.create.application.description.$touch()"
-                    @blur="$v.create.application.description.$touch()"
-                    :prepend-icon="'mdi-text'"
-                  />
-                </v-col>
-              </v-row>
-            </v-card-text>
-          </v-card>
-        </v-dialog>
+        <v-btn color="primary darken-2" rounded @click="resetCreate">
+          New Application
+        </v-btn>
       </v-col>
     </v-row>
     <v-expand-transition>
@@ -152,7 +57,7 @@
                   text
                   rounded
                   plain
-                  color="info"
+                  color="warning"
                   class="ml-4"
                   @click="resetUpdate(application)"
                 >
@@ -207,6 +112,90 @@
       </div>
     </v-expand-transition>
 
+    <!-- APPLICATION/CREATE DIALOG -->
+    <v-dialog
+      v-model="create.creating"
+      width="546"
+      persistent
+      overlay-opacity="0"
+    >
+      <v-card :loading="create.formLoadStatus === STATUS.LOADING">
+        <v-card-title>
+          <v-row no-gutters align="center">
+            <v-col cols="auto">New Application</v-col>
+            <v-spacer />
+            <v-col cols="auto">
+              <v-btn
+                v-if="
+                  create.formLoadStatus === STATUS.IDLE ||
+                  create.formLoadStatus === STATUS.ERROR
+                "
+                text
+                rounded
+                color="error"
+                @click="
+                  () => {
+                    cancelCreate();
+                  }
+                "
+              >
+                Cancel
+              </v-btn>
+              <v-btn
+                text
+                rounded
+                class="ml-4"
+                color="success"
+                :disabled="create.formLoadStatus === STATUS.LOADING"
+                @click="confirmCreate"
+              >
+                <div v-if="create.formLoadStatus !== STATUS.LOADING">
+                  Create
+                </div>
+                <div v-else>Creating</div>
+              </v-btn>
+            </v-col>
+          </v-row>
+        </v-card-title>
+        <v-divider inset />
+        <v-card-text class="pt-4">
+          <v-expand-transition>
+            <div v-show="create.formLoadStatus === STATUS.ERROR">
+              <v-alert type="error" text dense transition="scroll-y-transition">
+                Failed creating application!
+              </v-alert>
+            </div>
+          </v-expand-transition>
+          <v-row>
+            <v-col cols="12">
+              <v-text-field
+                v-model.trim="create.application.name"
+                :error-messages="createNameErrors"
+                :counter="20"
+                label="Name"
+                required
+                :disabled="create.formLoadStatus === STATUS.LOADING"
+                @input="$v.create.application.name.$touch()"
+                @blur="$v.create.application.name.$touch()"
+                :prepend-icon="'mdi-application'"
+              />
+              <v-text-field
+                v-model.trim="create.application.description"
+                :error-messages="createDescriptionErrors"
+                :counter="50"
+                label="Description"
+                required
+                :disabled="create.formLoadStatus === STATUS.LOADING"
+                @input="$v.create.application.description.$touch()"
+                @blur="$v.create.application.description.$touch()"
+                :prepend-icon="'mdi-text'"
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+    <!-- APPLICATION/UPDATE DIALOG -->
     <v-dialog
       v-model="update.updating"
       class="ml-4"
@@ -240,8 +229,10 @@
                 text
                 rounded
                 class="ml-4"
-                color="success"
-                :disabled="update.formLoadStatus === STATUS.LOADING"
+                color="warning"
+                :disabled="
+                  update.formLoadStatus === STATUS.LOADING || !updateChanged
+                "
                 @click="confirmUpdate"
               >
                 <div v-if="update.formLoadStatus !== STATUS.LOADING">
@@ -290,7 +281,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-
+    <!-- APPLICATION/DELTE DIALOG -->
     <v-dialog v-model="del.deleting" width="546" overlay-opacity="0">
       <v-card :loading="del.formLoadStatus === STATUS.LOADING">
         <v-card-title>
@@ -386,6 +377,7 @@ export default Vue.extend({
         deleting: false,
         formLoadStatus: STATUS.IDLE,
         successAlert: false,
+        apiResponseCode: "",
         application: new ApplicationInfo(),
       },
     };
@@ -426,6 +418,13 @@ export default Vue.extend({
         errors.push("Description too long");
       return errors;
     },
+    updateChanged() {
+      return (
+        this.$data.update.application.name !== this.$data.update.old.name ||
+        this.$data.update.application.description !==
+          this.$data.update.old.description
+      );
+    },
   },
 
   validations: {
@@ -463,9 +462,8 @@ export default Vue.extend({
                   application.services.push(service);
                 });
               })
-              .catch((error) => {
-                console.log("error");
-                console.log(error);
+              .catch(() => {
+                this.pageLoadStatus = STATUS.ERROR;
               });
           });
           this.pageLoadStatus = STATUS.COMPLETE;
@@ -476,8 +474,9 @@ export default Vue.extend({
     },
 
     resetCreate() {
-      this.create.application = new ApplicationInfo();
+      this.create.creating = true;
       this.create.formLoadStatus = STATUS.IDLE;
+      this.create.application = new ApplicationInfo();
       this.$v.create.$reset();
     },
     confirmCreate() {
@@ -508,9 +507,10 @@ export default Vue.extend({
 
     resetUpdate(application: ApplicationInfo) {
       this.update.updating = true;
-      this.update.application = new ApplicationInfo(application);
       this.update.formLoadStatus = STATUS.IDLE;
-      this.$v.$reset();
+      this.update.application = new ApplicationInfo(application);
+      this.update.old = application;
+      this.$v.update.$reset();
     },
     confirmUpdate() {
       this.$v.update.$touch();
