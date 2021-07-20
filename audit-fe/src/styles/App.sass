@@ -19,7 +19,7 @@ html
   text-align: center
   user-select: none
   -moz-user-select: none
-  -webkit-user-select: none       
+  -webkit-user-select: none
 
 a.text-link
   color: white !important
@@ -38,8 +38,25 @@ h1
 .v-card > .v-card__title
   padding: 16px 16px 16px 24px !important
 
-.v-card > .v-card__body
+.v-card > .v-card__subtitle
+  padding: 16px 16px 16px 24px !important
+
+.v-card > .v-card__text
   padding: 16px 24px 24px 24px
+
+.v-expansion-panel::before
+  box-shadow: 0px 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%) !important
+
+.v-expansion-panel
+  border-style: solid
+  border-color: rgba(255, 255, 255, 0.12)
+  border-width: 1px
+
+.v-expansion-panel:not(:first-child):not(.v-item--active)
+  border-width: 0 1px 1px 1px
+
+.v-expansion-panel:not(:first-child)::after
+  border-style: none
 
 code
   vertical-align: middle !important

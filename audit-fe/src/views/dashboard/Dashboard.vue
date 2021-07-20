@@ -88,6 +88,12 @@
             </v-list-item-icon>
             <v-list-item-title v-text="'Incidents'" />
           </v-list-item>
+          <v-list-item :to="{ name: 'dashboard:manage' }">
+            <v-list-item-icon>
+              <v-icon v-text="'mdi-application-cog'" />
+            </v-list-item-icon>
+            <v-list-item-title v-text="'Manage'" />
+          </v-list-item>
         </v-list-item-group>
       </v-list>
     </v-navigation-drawer>

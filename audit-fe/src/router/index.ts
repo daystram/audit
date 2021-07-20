@@ -1,6 +1,6 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
-import { Dashboard, Home, Incidents, Monitor } from "@/views";
+import { Dashboard, Home, Incidents, Manage, Monitor } from "@/views";
 import { authenticatedOnly, callback, login, logout, unAuthenticatedOnly } from "@/auth";
 
 Vue.use(VueRouter);
@@ -32,6 +32,14 @@ const routes: Array<RouteConfig> = [
         component: Incidents,
         meta: {
           title: "Incidents | Audit",
+        },
+      },
+      {
+        path: "manage",
+        name: "dashboard:manage",
+        component: Manage,
+        meta: {
+          title: "Manage | Audit",
         },
       },
     ],

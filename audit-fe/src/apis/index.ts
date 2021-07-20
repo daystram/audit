@@ -6,7 +6,7 @@ import { ApplicationInfo, ServiceInfo } from "./datatransfers";
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: `${
-    import.meta.env.DEV ? import.meta.env.VUE_APP_DEV_BASE_API : ""
+    import.meta.env.DEV ? import.meta.env.VITE_APP_DEV_BASE_API : ""
   }/api/`,
 });
 
