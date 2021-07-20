@@ -31,7 +31,7 @@ func NewApplicationOrmer(db *gorm.DB) ApplicationOrmer {
 }
 
 func (o *applicationOrm) GetAll() (applications []Application, err error) {
-	result := o.db.Model(&Application{}).Find(&applications)
+	result := o.db.Model(&Application{}).Order("name").Find(&applications)
 	return applications, result.Error
 }
 

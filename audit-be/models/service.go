@@ -39,7 +39,7 @@ func NewServiceOrmer(db *gorm.DB) ServiceOrmer {
 }
 
 func (o *serviceOrm) GetAllByApplicationID(applicationID string) (services []Service, err error) {
-	result := o.db.Model(&Service{}).Where("application_id = ?", applicationID).Find(&services)
+	result := o.db.Model(&Service{}).Where("application_id = ?", applicationID).Order("name").Find(&services)
 	return services, result.Error
 }
 
