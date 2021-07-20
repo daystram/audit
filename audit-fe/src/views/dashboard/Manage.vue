@@ -167,6 +167,14 @@
                                 :items="SERVICE_TYPE_LIST"
                                 :prepend-icon="'mdi-cogs'"
                               />
+                              <v-textarea
+                                v-model.trim="service.config"
+                                class="configuration-editor"
+                                label="Configuration"
+                                hint="Service tracking JSON configuration"
+                                disabled
+                                :prepend-icon="'mdi-code-tags'"
+                              />
                               <v-checkbox
                                 v-model.trim="service.showcase"
                                 label="Show service in Monitor page"
@@ -546,6 +554,7 @@
                 :error-messages="createServiceEndpointErrors"
                 :counter="50"
                 label="Endpoint"
+                hint="URL with protocol or IP address"
                 required
                 :disabled="createService.formLoadStatus === STATUS.LOADING"
                 @input="$v.createService.service.endpoint.$touch()"
@@ -559,6 +568,18 @@
                 :items="SERVICE_TYPE_LIST"
                 :disabled="createService.formLoadStatus === STATUS.LOADING"
                 :prepend-icon="'mdi-cogs'"
+              />
+              <v-textarea
+                v-model.trim="createService.service.config"
+                :error-messages="createServiceConfigErrors"
+                class="configuration-editor"
+                label="Configuration"
+                hint="Service tracking JSON configuration"
+                required
+                :disabled="createService.formLoadStatus === STATUS.LOADING"
+                @input="$v.createService.service.config.$touch()"
+                @blur="$v.createService.service.config.$touch()"
+                :prepend-icon="'mdi-code-tags'"
               />
               <v-checkbox
                 v-model.trim="createService.service.showcase"
@@ -659,6 +680,7 @@
                 :error-messages="updateServiceEndpointErrors"
                 :counter="50"
                 label="Endpoint"
+                hint="URL with protocol or IP address"
                 required
                 :disabled="updateService.formLoadStatus === STATUS.LOADING"
                 @input="$v.updateService.service.endpoint.$touch()"
@@ -672,6 +694,18 @@
                 :items="SERVICE_TYPE_LIST"
                 :disabled="updateService.formLoadStatus === STATUS.LOADING"
                 :prepend-icon="'mdi-cogs'"
+              />
+              <v-textarea
+                v-model.trim="updateService.service.config"
+                :error-messages="updateServiceConfigErrors"
+                class="configuration-editor"
+                label="Configuration"
+                hint="Service tracking JSON configuration"
+                required
+                :disabled="updateService.formLoadStatus === STATUS.LOADING"
+                @input="$v.updateService.service.config.$touch()"
+                @blur="$v.updateService.service.config.$touch()"
+                :prepend-icon="'mdi-code-tags'"
               />
               <v-checkbox
                 v-model.trim="updateService.service.showcase"
@@ -762,7 +796,7 @@ import {
   STATUS,
 } from "@/constants";
 import { ApplicationInfo, ServiceInfo } from "@/apis/datatransfers";
-import { ipAddressWithPort } from "@/utils/validators";
+import { ipAddressWithPort, isJson } from "@/utils/validators";
 import { maxLength, required, or, url } from "vuelidate/lib/validators";
 export default Vue.extend({
   data() {
@@ -901,6 +935,14 @@ export default Vue.extend({
         errors.push("Endpoint invalid");
       return errors;
     },
+    createServiceConfigErrors() {
+      const errors: string[] = [];
+      if (!this.$v.createService.service?.config.$dirty) return errors;
+      !this.$v.createService.service.config.required &&
+        errors.push("Configuration required");
+      !this.$v.createService.service.config.json && errors.push("Invalid JSON");
+      return errors;
+    },
     updateServiceNameErrors() {
       const errors: string[] = [];
       if (!this.$v.updateService.service?.name.$dirty) return errors;
@@ -928,6 +970,14 @@ export default Vue.extend({
         errors.push("Endpoint too long");
       !this.$v.updateService.service.endpoint.endpoint &&
         errors.push("Endpoint invalid");
+      return errors;
+    },
+    updateServiceConfigErrors() {
+      const errors: string[] = [];
+      if (!this.$v.updateService.service?.config.$dirty) return errors;
+      !this.$v.updateService.service.config.required &&
+        errors.push("Configuration required");
+      !this.$v.updateService.service.config.json && errors.push("Invalid JSON");
       return errors;
     },
     updateServiceChanged() {
@@ -970,6 +1020,10 @@ export default Vue.extend({
           maxLength: maxLength(50),
           endpoint: or(ipAddressWithPort, url),
         },
+        config: {
+          required,
+          json: or(isJson),
+        },
       },
     },
     updateService: {
@@ -980,6 +1034,10 @@ export default Vue.extend({
           required,
           maxLength: maxLength(50),
           endpoint: or(ipAddressWithPort, url),
+        },
+        config: {
+          required,
+          json: or(isJson),
         },
       },
     },
@@ -1123,13 +1181,13 @@ export default Vue.extend({
       this.createService.service.type = SERVICE_TYPE_LIST.filter(
         (type) => type.text === SERVICE_TYPE.HTTP
       )[0].value;
+      this.createService.service.config = JSON.stringify({});
       this.$v.createService.$reset();
     },
     confirmCreateService() {
       this.$v.createService.$touch();
       if (!this.$v.createService.$invalid) {
         this.createService.formLoadStatus = STATUS.LOADING;
-        this.createService.service.config = JSON.stringify({});
         api.application.service
           .create(
             this.createService.application.id as string,

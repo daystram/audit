@@ -78,7 +78,7 @@ export default {
         body.description = serviceInfo.description;
         body.endpoint = serviceInfo.endpoint;
         body.type = serviceInfo.type;
-        body.config = serviceInfo.config;
+        body.config = JSON.stringify(JSON.parse(serviceInfo.config)); // cleanup JSON
         body.showcase = !!serviceInfo.showcase; // sets to false if unset
         return apiClient.post(`application/${applicationId}/service/`, body);
       },
@@ -91,7 +91,7 @@ export default {
         body.description = serviceInfo.description;
         body.endpoint = serviceInfo.endpoint;
         body.type = serviceInfo.type;
-        body.config = serviceInfo.config;
+        body.config = JSON.stringify(JSON.parse(serviceInfo.config)); // cleanup JSON
         body.showcase = !!serviceInfo.showcase; // sets to false if unset
         return apiClient.put(
           `application/${applicationId}/service/${serviceInfo.id}`,
