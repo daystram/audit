@@ -9,10 +9,11 @@ import (
 
 func (m *module) ServiceGetAll(applicationID string) (serviceInfos []datatransfers.ServiceInfo, err error) {
 	var services []models.Service
+	serviceInfos = make([]datatransfers.ServiceInfo, 0)
 	if services, err = m.db.serviceOrmer.GetAllByApplicationID(applicationID); err == gorm.ErrRecordNotFound {
-		return nil, nil
+		return serviceInfos, nil
 	} else if err != nil {
-		return nil, err
+		return serviceInfos, err
 	}
 	for _, service := range services {
 		serviceInfos = append(serviceInfos, datatransfers.ServiceInfo{

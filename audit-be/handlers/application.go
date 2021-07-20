@@ -13,7 +13,7 @@ func (m *module) ApplicationGetAll() (applicationInfos []datatransfers.Applicati
 	if applications, err = m.db.applicationOrmer.GetAll(); err == gorm.ErrRecordNotFound {
 		return applicationInfos, nil
 	} else if err != nil {
-		return applicationInfos, err
+		return nil, err
 	}
 	for _, application := range applications {
 		applicationInfos = append(applicationInfos, datatransfers.ApplicationInfo{
