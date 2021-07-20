@@ -1,7 +1,13 @@
 import Vue from "vue";
 import VueRouter, { RouteConfig } from "vue-router";
 import { Dashboard, Home, Incidents, Manage, Monitor } from "@/views";
-import { authenticatedOnly, callback, login, logout, unAuthenticatedOnly } from "@/auth";
+import {
+  authenticatedOnly,
+  callback,
+  login,
+  logout,
+  unAuthenticatedOnly,
+} from "@/auth";
 
 Vue.use(VueRouter);
 
@@ -70,7 +76,7 @@ const routes: Array<RouteConfig> = [
 
 const router = new VueRouter({
   mode: "history",
-  base: import.meta.env.BASE_URL,
+  base: process.env.BASE_URL,
   routes,
 });
 

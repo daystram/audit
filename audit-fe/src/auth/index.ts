@@ -2,14 +2,10 @@ import { RatifyClient } from "@daystram/ratify-client";
 import router from "@/router";
 import { Route } from "vue-router";
 
-const CLIENT_ID = import.meta.env.VUE_APP_CLIENT_ID as string;
-const ISSUER = import.meta.env.VUE_APP_OAUTH_ISSUER as string;
+const CLIENT_ID = process.env.VUE_APP_CLIENT_ID as string;
+const ISSUER = process.env.VUE_APP_OAUTH_ISSUER as string;
 const REDIRECT_URI = `${location.origin}/callback`;
 
-/*
-  TODO: wait for @daystram/ratify-client@1.5.0. currrent version uses NodeJS built-in 'crypto' which cannot be import on Vite.
-        see https://github.com/vitejs/vite/issues/728 for more detail.
-*/
 const authManager = new RatifyClient({
   clientId: CLIENT_ID,
   redirectUri: REDIRECT_URI,

@@ -127,7 +127,6 @@ jobs:
           name: build-fe
           path: |
             audit-fe/dist/
-            audit-fe/stats.html
   lint-tr:
     name: Lint audit-tr
     runs-on: ubuntu-latest

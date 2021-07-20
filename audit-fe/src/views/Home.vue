@@ -52,7 +52,7 @@ export default Vue.extend({
   },
   data() {
     return {
-      appVersion: import.meta.env.VITE_APP_VERSION,
+      appVersion: process.env.VUE_APP_VERSION,
     };
   },
   computed: {
