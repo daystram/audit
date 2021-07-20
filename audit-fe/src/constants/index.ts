@@ -1,3 +1,4 @@
+import { SERVICE_STATUS } from "./service";
 import { STATUS } from "./status";
 
-export { STATUS };
+export { SERVICE_STATUS, STATUS };

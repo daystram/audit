@@ -3,6 +3,7 @@ export class ApplicationInfo {
   id?: string;
   name: string;
   description: string;
+  services: Array<ServiceInfo>;
   createdAt?: number;
   updatedAt?: number;
 
@@ -15,6 +16,7 @@ export class ApplicationInfo {
     this.id = source["id"];
     this.name = source["name"];
     this.description = source["description"];
+    this.services = source["services"];
     this.createdAt = source["createdAt"];
     this.updatedAt = source["updatedAt"];
   }
