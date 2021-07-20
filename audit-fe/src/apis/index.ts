@@ -41,15 +41,18 @@ export default {
     create: function (
       applicationInfo: ApplicationInfo
     ): Promise<AxiosResponse> {
-      return apiClient.post(`application/`, applicationInfo);
+      const body = new ApplicationInfo();
+      body.name = applicationInfo.name;
+      body.description = applicationInfo.description;
+      return apiClient.post(`application/`, body);
     },
     update: function (
       applicationInfo: ApplicationInfo
     ): Promise<AxiosResponse> {
-      return apiClient.put(
-        `application/${applicationInfo.id}`,
-        applicationInfo
-      );
+      const body = new ApplicationInfo();
+      body.name = applicationInfo.name;
+      body.description = applicationInfo.description;
+      return apiClient.put(`application/${applicationInfo.id}`, body);
     },
     delete: function (applicationId: string): Promise<AxiosResponse> {
       return apiClient.delete(`application/${applicationId}`);
@@ -70,18 +73,29 @@ export default {
         applicationId: string,
         serviceInfo: ServiceInfo
       ): Promise<AxiosResponse> {
-        return apiClient.post(
-          `application/${applicationId}/service/`,
-          serviceInfo
-        );
+        const body = new ServiceInfo();
+        body.name = serviceInfo.name;
+        body.description = serviceInfo.description;
+        body.endpoint = serviceInfo.endpoint;
+        body.type = serviceInfo.type;
+        body.config = serviceInfo.config;
+        body.showcase = !!serviceInfo.showcase; // sets to false if unset
+        return apiClient.post(`application/${applicationId}/service/`, body);
       },
       update: function (
         applicationId: string,
         serviceInfo: ServiceInfo
       ): Promise<AxiosResponse> {
+        const body = new ServiceInfo();
+        body.name = serviceInfo.name;
+        body.description = serviceInfo.description;
+        body.endpoint = serviceInfo.endpoint;
+        body.type = serviceInfo.type;
+        body.config = serviceInfo.config;
+        body.showcase = !!serviceInfo.showcase; // sets to false if unset
         return apiClient.put(
           `application/${applicationId}/service/${serviceInfo.id}`,
-          serviceInfo
+          body
         );
       },
       delete: function (
