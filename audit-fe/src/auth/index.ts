@@ -42,7 +42,7 @@ const callback = function (): void {
         });
       } else {
         router.replace({
-          name: "manage:create",
+          name: "dashboard:monitor",
         });
       }
     })
@@ -77,7 +77,7 @@ const unAuthenticatedOnly = function (
   if (!authManager.isAuthenticated()) {
     next();
   } else {
-    router.push({ name: "manage:create" });
+    router.push({ name: "dashboard:monitor" });
   }
 };
 

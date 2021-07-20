@@ -44,6 +44,7 @@ const routes: Array<RouteConfig> = [
         path: "manage",
         name: "dashboard:manage",
         component: Manage,
+        beforeEnter: authenticatedOnly,
         meta: {
           title: "Manage | Audit",
         },

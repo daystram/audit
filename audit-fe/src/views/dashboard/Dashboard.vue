@@ -74,6 +74,17 @@
       />
     </v-app-bar>
     <v-navigation-drawer app clipped v-model="drawer">
+      <v-alert
+        v-if="!isAuthenticated"
+        type="primary"
+        icon="mdi-satellite-variant"
+        text
+        prominent
+        tile
+        class="mb-0"
+      >
+        Sign in to manage applications and services!
+      </v-alert>
       <v-list nav dense rounded>
         <v-list-item-group color="primary">
           <v-list-item :to="{ name: 'dashboard:monitor' }">
@@ -88,7 +99,10 @@
             </v-list-item-icon>
             <v-list-item-title v-text="'Incidents'" />
           </v-list-item>
-          <v-list-item :to="{ name: 'dashboard:manage' }">
+          <v-list-item
+            v-if="isAuthenticated"
+            :to="{ name: 'dashboard:manage' }"
+          >
             <v-list-item-icon>
               <v-icon v-text="'mdi-application-cog'" />
             </v-list-item-icon>
