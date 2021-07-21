@@ -3,11 +3,14 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 
+	"github.com/daystram/audit/audit-be/controllers/middleware"
 	"github.com/daystram/audit/audit-be/handlers"
+	"github.com/daystram/audit/audit-be/utils"
 )
 
 func InitializeRouter(h handlers.HandlerFunc) (router *gin.Engine) {
 	router = gin.Default()
+	router.Use(middleware.AuthMiddleware)
 	api := router.Group("/api")
 	{
 		monitor := api.Group("/monitor")
@@ -15,7 +18,7 @@ func InitializeRouter(h handlers.HandlerFunc) (router *gin.Engine) {
 			monitor.GET("/", GETMonitorList(h))
 		}
 
-		application := api.Group("/application")
+		application := api.Group("/application", utils.AuthOnly)
 		{
 			application.GET("/", GETApplicationList(h))
 			application.POST("/", POSTApplicationCreate(h))
