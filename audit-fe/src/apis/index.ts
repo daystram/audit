@@ -31,6 +31,11 @@ const withAuth = () => ({
 });
 
 export default {
+  monitor: {
+    get: function (): Promise<AxiosResponse> {
+      return apiClient.get(`monitor/`);
+    },
+  },
   application: {
     list: function (): Promise<AxiosResponse> {
       return apiClient.get(`application/`);
@@ -79,7 +84,8 @@ export default {
         body.endpoint = serviceInfo.endpoint;
         body.type = serviceInfo.type;
         body.config = JSON.stringify(JSON.parse(serviceInfo.config)); // cleanup JSON
-        body.showcase = !!serviceInfo.showcase; // sets to false if unset
+        body.enabled = !!serviceInfo.enabled; // sets to false if unset
+        body.showcase = !!serviceInfo.showcase;
         return apiClient.post(`application/${applicationId}/service/`, body);
       },
       update: function (
@@ -92,7 +98,8 @@ export default {
         body.endpoint = serviceInfo.endpoint;
         body.type = serviceInfo.type;
         body.config = JSON.stringify(JSON.parse(serviceInfo.config)); // cleanup JSON
-        body.showcase = !!serviceInfo.showcase; // sets to false if unset
+        body.enabled = !!serviceInfo.enabled; // sets to false if unset
+        body.showcase = !!serviceInfo.showcase;
         return apiClient.put(
           `application/${applicationId}/service/${serviceInfo.id}`,
           body

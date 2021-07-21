@@ -128,13 +128,29 @@
                         :key="service.id"
                       >
                         <v-expansion-panel-header>
-                          <template v-slot:default="">
-                            <v-row no-gutters>
-                              <v-col cols="4">
+                          <template v-slot:default>
+                            <v-row no-gutters align="center">
+                              <v-col cols="12" sm="4" class="text-truncate">
                                 <b>{{ service.name }}</b>
                               </v-col>
-                              <v-col cols="8" class="text--secondary">
+                              <v-col
+                                cols="12"
+                                sm="6"
+                                class="text--secondary text-truncate"
+                              >
                                 {{ service.description }}
+                              </v-col>
+                              <v-col cols="12" sm="2">
+                                <v-icon
+                                  :color="service.enabled ? 'primary' : 'grey'"
+                                >
+                                  mdi-chart-box
+                                </v-icon>
+                                <v-icon
+                                  :color="service.showcase ? 'primary' : 'grey'"
+                                >
+                                  mdi-radar
+                                </v-icon>
                               </v-col>
                             </v-row>
                           </template>
@@ -142,18 +158,6 @@
                         <v-expansion-panel-content>
                           <v-row>
                             <v-col cols="12">
-                              <v-text-field
-                                v-model.trim="service.name"
-                                label="Name"
-                                disabled
-                                :prepend-icon="'mdi-server'"
-                              />
-                              <v-text-field
-                                v-model.trim="service.description"
-                                label="Description"
-                                disabled
-                                :prepend-icon="'mdi-text'"
-                              />
                               <v-text-field
                                 v-model.trim="service.endpoint"
                                 label="Endpoint"
@@ -174,12 +178,6 @@
                                 hint="Service tracking JSON configuration"
                                 disabled
                                 :prepend-icon="'mdi-code-tags'"
-                              />
-                              <v-checkbox
-                                v-model.trim="service.showcase"
-                                label="Show service in Monitor page"
-                                disabled
-                                :prepend-icon="'mdi-radar'"
                               />
                             </v-col>
                           </v-row>
@@ -585,6 +583,12 @@
                 :prepend-icon="'mdi-code-tags'"
               />
               <v-checkbox
+                v-model.trim="createService.service.enabled"
+                label="Enable service tracking"
+                :disabled="createService.formLoadStatus === STATUS.LOADING"
+                :prepend-icon="'mdi-chart-box'"
+              />
+              <v-checkbox
                 v-model.trim="createService.service.showcase"
                 label="Show service in Monitor page"
                 required
@@ -709,6 +713,12 @@
                 @input="$v.updateService.service.config.$touch()"
                 @blur="$v.updateService.service.config.$touch()"
                 :prepend-icon="'mdi-code-tags'"
+              />
+              <v-checkbox
+                v-model.trim="updateService.service.enabled"
+                label="Enable service tracking"
+                :disabled="updateService.formLoadStatus === STATUS.LOADING"
+                :prepend-icon="'mdi-chart-box'"
               />
               <v-checkbox
                 v-model.trim="updateService.service.showcase"
@@ -995,6 +1005,8 @@ export default Vue.extend({
           this.$data.updateService.old.type ||
         this.$data.updateService.service.config !==
           this.$data.updateService.old.config ||
+        this.$data.updateService.service.enabled !==
+          this.$data.updateService.old.enabled ||
         this.$data.updateService.service.showcase !==
           this.$data.updateService.old.showcase
       );

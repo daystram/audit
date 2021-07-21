@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export class ApplicationInfo {
   id?: string;
+  services: Array<ServiceInfo>;
   name: string;
   description: string;
-  services: Array<ServiceInfo>;
   createdAt?: number;
   updatedAt?: number;
 
@@ -14,13 +14,14 @@ export class ApplicationInfo {
   constructor(source: any = {}) {
     if ("string" === typeof source) source = JSON.parse(source);
     this.id = source["id"];
+    this.services = source["services"];
     this.name = source["name"];
     this.description = source["description"];
-    this.services = source["services"];
     this.createdAt = source["createdAt"];
     this.updatedAt = source["updatedAt"];
   }
 }
+
 export class ServiceInfo {
   id?: string;
   name: string;
@@ -28,6 +29,7 @@ export class ServiceInfo {
   endpoint: string;
   type: string;
   config: string;
+  enabled: boolean;
   showcase: boolean;
   createdAt: number;
   updatedAt: number;
@@ -44,6 +46,7 @@ export class ServiceInfo {
     this.endpoint = source["endpoint"];
     this.type = source["type"];
     this.config = source["config"];
+    this.enabled = source["enabled"];
     this.showcase = source["showcase"];
     this.createdAt = source["createdAt"];
     this.updatedAt = source["updatedAt"];
