@@ -10,6 +10,11 @@ func InitializeRouter(h handlers.HandlerFunc) (router *gin.Engine) {
 	router = gin.Default()
 	api := router.Group("/api")
 	{
+		monitor := api.Group("/monitor")
+		{
+			monitor.GET("/", GETMonitorList(h))
+		}
+
 		application := api.Group("/application")
 		{
 			application.GET("/", GETApplicationList(h))
