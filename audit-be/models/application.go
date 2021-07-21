@@ -10,7 +10,9 @@ type applicationOrm struct {
 
 // CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 type Application struct {
-	ID          string `gorm:"column:id;primaryKey;type:uuid;default:uuid_generate_v4()" json:"-"`
+	ID       string    `gorm:"column:id;primaryKey;type:uuid;default:uuid_generate_v4()" json:"-"`
+	Services []Service `gorm:"foreignKey:ApplicationID;references:id"`
+
 	Name        string `gorm:"column:name;type:varchar(20);not null" json:"-"`
 	Description string `gorm:"column:description;type:varchar(50)" json:"-"`
 	CreatedAt   int64  `gorm:"column:created_at;autoCreateTime" json:"-"`
@@ -19,6 +21,7 @@ type Application struct {
 
 type ApplicationOrmer interface {
 	GetAll() (applications []Application, err error)
+	GetAllShowcaseWithServices() (applications []Application, err error)
 	GetOneByID(ID string) (application Application, err error)
 	Insert(application Application) (ID string, err error)
 	Update(application Application) (err error)
@@ -32,6 +35,15 @@ func NewApplicationOrmer(db *gorm.DB) ApplicationOrmer {
 
 func (o *applicationOrm) GetAll() (applications []Application, err error) {
 	result := o.db.Model(&Application{}).Order("name").Find(&applications)
+	return applications, result.Error
+}
+
+func (o *applicationOrm) GetAllShowcaseWithServices() (applications []Application, err error) {
+	result := o.db.Joins("JOIN services ON services.application_id = applications.id").
+		Where("services.showcase = true").
+		Order("applications.name").
+		Preload("Services", "showcase = true").
+		Find(&applications)
 	return applications, result.Error
 }
 
