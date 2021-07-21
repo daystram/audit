@@ -34,14 +34,16 @@ func NewApplicationOrmer(db *gorm.DB) ApplicationOrmer {
 }
 
 func (o *applicationOrm) GetAll() (applications []Application, err error) {
-	result := o.db.Model(&Application{}).Order("name").Find(&applications)
+	result := o.db.Model(&Application{}).Order("applications.name ASC").Order("applications.id ASC").Find(&applications)
 	return applications, result.Error
 }
 
 func (o *applicationOrm) GetAllShowcaseWithServices() (applications []Application, err error) {
-	result := o.db.Joins("JOIN services ON services.application_id = applications.id").
+	result := o.db.
+		Distinct("applications.id", "applications.name", "applications.description").
+		Joins("JOIN services ON services.application_id = applications.id").
 		Where("services.showcase = true").
-		Order("applications.name").
+		Order("applications.name ASC").Order("applications.id ASC").
 		Preload("Services", "showcase = true").
 		Find(&applications)
 	return applications, result.Error
