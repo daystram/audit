@@ -38,10 +38,10 @@ export default {
   },
   application: {
     list: function (): Promise<AxiosResponse> {
-      return apiClient.get(`application/`);
+      return apiClient.get(`application/`, withAuth());
     },
     get: function (id: string): Promise<AxiosResponse> {
-      return apiClient.get(`application/${id}`);
+      return apiClient.get(`application/${id}`, withAuth());
     },
     create: function (
       applicationInfo: ApplicationInfo
@@ -49,7 +49,7 @@ export default {
       const body = new ApplicationInfo();
       body.name = applicationInfo.name;
       body.description = applicationInfo.description;
-      return apiClient.post(`application/`, body);
+      return apiClient.post(`application/`, body, withAuth());
     },
     update: function (
       applicationInfo: ApplicationInfo
@@ -57,21 +57,29 @@ export default {
       const body = new ApplicationInfo();
       body.name = applicationInfo.name;
       body.description = applicationInfo.description;
-      return apiClient.put(`application/${applicationInfo.id}`, body);
+      return apiClient.put(
+        `application/${applicationInfo.id}`,
+        body,
+        withAuth()
+      );
     },
     delete: function (applicationId: string): Promise<AxiosResponse> {
-      return apiClient.delete(`application/${applicationId}`);
+      return apiClient.delete(`application/${applicationId}`, withAuth());
     },
     service: {
       list: function (applicationId: string): Promise<AxiosResponse> {
-        return apiClient.get(`application/${applicationId}/service/`);
+        return apiClient.get(
+          `application/${applicationId}/service/`,
+          withAuth()
+        );
       },
       get: function (
         applicationId: string,
         serviceId: string
       ): Promise<AxiosResponse> {
         return apiClient.get(
-          `application/${applicationId}/service/${serviceId}`
+          `application/${applicationId}/service/${serviceId}`,
+          withAuth()
         );
       },
       create: function (
@@ -86,7 +94,11 @@ export default {
         body.config = JSON.stringify(JSON.parse(serviceInfo.config)); // cleanup JSON
         body.enabled = !!serviceInfo.enabled; // sets to false if unset
         body.showcase = !!serviceInfo.showcase;
-        return apiClient.post(`application/${applicationId}/service/`, body);
+        return apiClient.post(
+          `application/${applicationId}/service/`,
+          body,
+          withAuth()
+        );
       },
       update: function (
         applicationId: string,
@@ -102,7 +114,8 @@ export default {
         body.showcase = !!serviceInfo.showcase;
         return apiClient.put(
           `application/${applicationId}/service/${serviceInfo.id}`,
-          body
+          body,
+          withAuth()
         );
       },
       delete: function (
@@ -110,7 +123,8 @@ export default {
         serviceId: string
       ): Promise<AxiosResponse> {
         return apiClient.delete(
-          `application/${applicationId}/service/${serviceId}`
+          `application/${applicationId}/service/${serviceId}`,
+          withAuth()
         );
       },
     },
