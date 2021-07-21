@@ -39,6 +39,7 @@
                 >
                   mdi-alert-octagon-outline
                 </v-icon>
+                <v-icon v-else>mdi-alert-octagon-outline</v-icon>
               </v-card-title>
               <v-card-subtitle>{{ application.description }}</v-card-subtitle>
               <v-divider inset />
@@ -50,19 +51,62 @@
                     :key="service.id"
                   >
                     <v-expansion-panel-header disable-icon-rotate>
-                      <b>{{ service.name }}</b>
+                      <template v-slot:default>
+                        <v-row no-gutters>
+                          <v-col cols="12" sm="4" class="text-truncate">
+                            <b>{{ service.name }}</b>
+                          </v-col>
+                          <v-col
+                            cols="12"
+                            sm="6"
+                            class="text--secondary text-truncate"
+                          >
+                            {{ service.description }}
+                          </v-col>
+                          <v-col cols="12" sm="2"></v-col>
+                        </v-row>
+                      </template>
                       <template v-slot:actions>
-                        <v-icon color="success">mdi-server</v-icon>
+                        <v-icon
+                          v-if="getServiceStatus(service) === SERVICE_STATUS.OK"
+                          color="success"
+                        >
+                          mdi-server
+                        </v-icon>
+                        <v-icon
+                          v-else-if="
+                            getServiceStatus(service) === SERVICE_STATUS.WARNING
+                          "
+                          color="warning"
+                        >
+                          mdi-server
+                        </v-icon>
+                        <v-icon
+                          v-else-if="
+                            getServiceStatus(service) === SERVICE_STATUS.ERROR
+                          "
+                          color="error"
+                        >
+                          mdi-server
+                        </v-icon>
+                        <v-icon
+                          v-else-if="
+                            getServiceStatus(service) ===
+                            SERVICE_STATUS.DISABLED
+                          "
+                          color="grey"
+                        >
+                          mdi-server
+                        </v-icon>
+                        <v-icon v-else>mdi-server</v-icon>
                       </template>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      <div>
+                      <v-row>
                         <v-col cols="12">
-                          <v-row>
-                            {{ service.description }}
-                          </v-row>
+                          <div>WIP</div>
                         </v-col>
-                      </div>
+                      </v-row>
                     </v-expansion-panel-content>
                   </v-expansion-panel>
                 </v-expansion-panels>
@@ -114,25 +158,31 @@ export default Vue.extend({
     };
   },
   created() {
-    api.application.list().then((response) => {
-      response.data.data.forEach((application: ApplicationInfo) => {
-        this.applications.push(application);
-        this.$set(application, "services", new Array<ServiceInfo>()); // solves Vue's nested object reactivity detection
-        api.application.service
-          .list(application.id as string)
-          .then((response) => {
-            response.data.data.forEach((service: ServiceInfo) => {
-              application.services.push(service);
-            });
-          });
-      });
-      this.pageLoadStatus = STATUS.COMPLETE;
-    });
+    this.loadMonitor();
   },
   methods: {
-    getApplicationStatus: (application: ApplicationInfo) => {
+    loadMonitor() {
+      this.applications = new Array<ApplicationInfo>();
+      api.monitor
+        .get()
+        .then((response) => {
+          response.data.data.forEach((application: ApplicationInfo) => {
+            this.applications.push(application);
+          });
+          this.pageLoadStatus = STATUS.COMPLETE;
+        })
+        .catch(() => {
+          this.pageLoadStatus = STATUS.ERROR;
+        });
+    },
+    getApplicationStatus(application: ApplicationInfo) {
       if (application.services.length === 0) return SERVICE_STATUS.WARNING;
-      // TODO: check each service's status
+      // TODO
+      return SERVICE_STATUS.OK;
+    },
+    getServiceStatus(service: ServiceInfo) {
+      if (!service.enabled) return SERVICE_STATUS.DISABLED;
+      // TODO
       return SERVICE_STATUS.OK;
     },
   },
