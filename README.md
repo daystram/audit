@@ -1,11 +1,11 @@
-# :satellite: Audit
+# :artificial_satellite: Audit
 
 [![Github Actions](https://github.com/daystram/audit/actions/workflows/push.yml/badge.svg)](https://github.com/daystram/audit/actions/workflows/push.yml)
 [![Codecov](https://codecov.io/gh/daystram/audit/branch/master/graph/badge.svg?token=VI1CYFQ50N)](https://codecov.io/gh/daystram/audit)
 [![Docker Pulls](https://img.shields.io/docker/pulls/daystram/audit)](https://hub.docker.com/r/daystram/audit)
 [![MIT License](https://img.shields.io/github/license/daystram/audit)](https://github.com/daystram/audit/blob/master/LICENSE)
 
-**Audit** is a service monitoring and incident management service.
+**Audit** is a service monitor and incident manager.
 
 ## Features
 

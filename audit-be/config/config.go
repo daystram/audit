@@ -15,6 +15,10 @@ type Config struct {
 
 	TrackerServerPort int
 
+	RatifyIssuer       string
+	RatifyClientID     string
+	RatifyClientSecret string
+
 	DBHost     string
 	DBPort     int
 	DBDatabase string
@@ -42,6 +46,10 @@ func InitializeAppConfig() {
 	AppConfig.Debug = viper.GetBool("DEBUG")
 
 	AppConfig.TrackerServerPort = viper.GetInt("TRACKER_SERVER_PORT")
+
+	AppConfig.RatifyIssuer = viper.GetString("RATIFY_ISSUER")
+	AppConfig.RatifyClientID = viper.GetString("RATIFY_CLIENT_ID")
+	AppConfig.RatifyClientSecret = viper.GetString("RATIFY_CLIENT_SECRET")
 
 	AppConfig.DBHost = viper.GetString("DB_HOST")
 	AppConfig.DBPort = viper.GetInt("DB_PORT")

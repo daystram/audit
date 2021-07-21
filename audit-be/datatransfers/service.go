@@ -9,7 +9,8 @@ type ServiceInfo struct {
 	Endpoint    string `json:"endpoint" binding:"required"`
 	Type        string `json:"type" binding:"required"`
 	Config      string `json:"config" binding:"required"` // TODO: needs standard format, check via marshalling
-	Showcase    bool   `json:"showcase" binding:"required"`
+	Enabled     bool   `json:"enabled" binding:"-"`
+	Showcase    bool   `json:"showcase" binding:"-"`
 
 	CreatedAt int64 `json:"createdAt" binding:"-"`
 	UpdatedAt int64 `json:"updatedAt" binding:"-"`

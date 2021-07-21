@@ -27,7 +27,7 @@ func (suite *V1ApplicationTestSuite) SetupTest() {
 	ctrl := gomock.NewController(suite.T())
 	suite.MockHandler = mock_handlers.NewMockHandlerFunc(ctrl)
 	suite.Router = InitializeRouter(suite.MockHandler)
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.TestMode)
 }
 
 func (suite *V1ApplicationTestSuite) TestGETApplicationList() {
@@ -40,15 +40,23 @@ func (suite *V1ApplicationTestSuite) TestGETApplicationList() {
 			UpdatedAt:   2,
 		}}, nil)
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/application/", nil)
+		req, _ := http.NewRequest(http.MethodGet, "/api/application/", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
-		assert.JSONEq(suite.T(), `{"data": [{"id":"app_id", "name":"Test App", "description": "Description", "createdAt": 1, "updatedAt": 2}]}`, w.Body.String())
+		assert.JSONEq(suite.T(), `{
+			"data": [{
+				"id": "app_id", 
+				"name": "Test App", 
+				"description": "Description", 
+				"createdAt": 1, 
+				"updatedAt": 2
+			}]
+		}`, w.Body.String())
 	})
 	suite.T().Run("no applications", func(t *testing.T) {
 		suite.MockHandler.EXPECT().ApplicationGetAll().Return(make([]datatransfers.ApplicationInfo, 0), nil)
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/application/", nil)
+		req, _ := http.NewRequest(http.MethodGet, "/api/application/", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
 		assert.JSONEq(suite.T(), `{"data": []}`, w.Body.String())
@@ -56,7 +64,7 @@ func (suite *V1ApplicationTestSuite) TestGETApplicationList() {
 	suite.T().Run("has error", func(t *testing.T) {
 		suite.MockHandler.EXPECT().ApplicationGetAll().Return([]datatransfers.ApplicationInfo{}, errors.New(""))
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/application/", nil)
+		req, _ := http.NewRequest(http.MethodGet, "/api/application/", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusInternalServerError, w.Code)
 		assert.Contains(suite.T(), w.Body.String(), `"error"`)
@@ -70,7 +78,7 @@ func (suite *V1ApplicationTestSuite) TestPOSTApplicationCreate() {
 			Description: "Description",
 		}).Return("app_id", nil)
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPost, "/application/", strings.NewReader(`{"name": "Test App", "description": "Description"}`))
+		req, _ := http.NewRequest(http.MethodPost, "/api/application/", strings.NewReader(`{"name": "Test App", "description": "Description"}`))
 		req.Header.Set("Content-Type", "application/json")
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
@@ -78,7 +86,7 @@ func (suite *V1ApplicationTestSuite) TestPOSTApplicationCreate() {
 	})
 	suite.T().Run("bad request", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPost, "/application/", strings.NewReader(`{"description": "Description"}`))
+		req, _ := http.NewRequest(http.MethodPost, "/api/application/", strings.NewReader(`{"description": "Description"}`))
 		req.Header.Set("Content-Type", "application/json")
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusBadRequest, w.Code)
@@ -89,7 +97,7 @@ func (suite *V1ApplicationTestSuite) TestPOSTApplicationCreate() {
 			Description: "Description",
 		}).Return("", errors.New(""))
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPost, "/application/", strings.NewReader(`{"name": "Test App", "description": "Description"}`))
+		req, _ := http.NewRequest(http.MethodPost, "/api/application/", strings.NewReader(`{"name": "Test App", "description": "Description"}`))
 		req.Header.Set("Content-Type", "application/json")
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusInternalServerError, w.Code)
@@ -107,15 +115,23 @@ func (suite *V1ApplicationTestSuite) TestGETApplicationDetail() {
 			UpdatedAt:   2,
 		}, nil)
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/application/app_id", nil)
+		req, _ := http.NewRequest(http.MethodGet, "/api/application/app_id", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
-		assert.JSONEq(suite.T(), `{"data": {"id":"app_id", "name":"Test App", "description": "Description", "createdAt": 1, "updatedAt": 2}}`, w.Body.String())
+		assert.JSONEq(suite.T(), `{
+			"data": {
+				"id": "app_id", 
+				"name": "Test App", 
+				"description": "Description", 
+				"createdAt": 1, 
+				"updatedAt": 2
+			}
+		}`, w.Body.String())
 	})
 	suite.T().Run("no application", func(t *testing.T) {
 		suite.MockHandler.EXPECT().ApplicationGetOne("app_id").Return(datatransfers.ApplicationInfo{}, gorm.ErrRecordNotFound)
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/application/app_id", nil)
+		req, _ := http.NewRequest(http.MethodGet, "/api/application/app_id", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusNotFound, w.Code)
 		assert.JSONEq(suite.T(), `{}`, w.Body.String())
@@ -123,7 +139,7 @@ func (suite *V1ApplicationTestSuite) TestGETApplicationDetail() {
 	suite.T().Run("has error", func(t *testing.T) {
 		suite.MockHandler.EXPECT().ApplicationGetOne("app_id").Return(datatransfers.ApplicationInfo{}, errors.New(""))
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodGet, "/application/app_id", nil)
+		req, _ := http.NewRequest(http.MethodGet, "/api/application/app_id", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusInternalServerError, w.Code)
 		assert.Contains(suite.T(), w.Body.String(), `"error"`)
@@ -138,7 +154,7 @@ func (suite *V1ApplicationTestSuite) TestPUTApplicationUpdate() {
 			Description: "Description",
 		}).Return(nil)
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPut, "/application/app_id", strings.NewReader(`{"name": "Test App", "description": "Description"}`))
+		req, _ := http.NewRequest(http.MethodPut, "/api/application/app_id", strings.NewReader(`{"name": "Test App", "description": "Description"}`))
 		req.Header.Set("Content-Type", "application/json")
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
@@ -146,7 +162,7 @@ func (suite *V1ApplicationTestSuite) TestPUTApplicationUpdate() {
 	})
 	suite.T().Run("bad request", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPut, "/application/app_id", strings.NewReader(`{"description": "Description"}`))
+		req, _ := http.NewRequest(http.MethodPut, "/api/application/app_id", strings.NewReader(`{"description": "Description"}`))
 		req.Header.Set("Content-Type", "application/json")
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusBadRequest, w.Code)
@@ -158,7 +174,7 @@ func (suite *V1ApplicationTestSuite) TestPUTApplicationUpdate() {
 			Description: "Description",
 		}).Return(errors.New(""))
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodPut, "/application/app_id", strings.NewReader(`{"name": "Test App", "description": "Description"}`))
+		req, _ := http.NewRequest(http.MethodPut, "/api/application/app_id", strings.NewReader(`{"name": "Test App", "description": "Description"}`))
 		req.Header.Set("Content-Type", "application/json")
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusInternalServerError, w.Code)
@@ -170,7 +186,7 @@ func (suite *V1ApplicationTestSuite) TestDELETEApplicationDelete() {
 	suite.T().Run("delete", func(t *testing.T) {
 		suite.MockHandler.EXPECT().ApplicationDelete("app_id").Return(nil)
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodDelete, "/application/app_id", nil)
+		req, _ := http.NewRequest(http.MethodDelete, "/api/application/app_id", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
 		assert.JSONEq(suite.T(), `{}`, w.Body.String())
@@ -178,7 +194,7 @@ func (suite *V1ApplicationTestSuite) TestDELETEApplicationDelete() {
 	suite.T().Run("has error", func(t *testing.T) {
 		suite.MockHandler.EXPECT().ApplicationDelete("app_id").Return(errors.New(""))
 		w := httptest.NewRecorder()
-		req, _ := http.NewRequest(http.MethodDelete, "/application/app_id", nil)
+		req, _ := http.NewRequest(http.MethodDelete, "/api/application/app_id", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusInternalServerError, w.Code)
 		assert.Contains(suite.T(), w.Body.String(), `"error"`)

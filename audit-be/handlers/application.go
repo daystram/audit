@@ -9,8 +9,9 @@ import (
 
 func (m *module) ApplicationGetAll() (applicationInfos []datatransfers.ApplicationInfo, err error) {
 	var applications []models.Application
+	applicationInfos = make([]datatransfers.ApplicationInfo, 0)
 	if applications, err = m.db.applicationOrmer.GetAll(); err == gorm.ErrRecordNotFound {
-		return nil, nil
+		return applicationInfos, nil
 	} else if err != nil {
 		return nil, err
 	}

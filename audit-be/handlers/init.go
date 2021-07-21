@@ -16,6 +16,9 @@ import (
 )
 
 type HandlerFunc interface {
+	// Monitor
+	MonitorGetAll() (applicationInfos []datatransfers.ApplicationInfo, err error)
+
 	// Application
 	ApplicationGetAll() (applicationInfos []datatransfers.ApplicationInfo, err error)
 	ApplicationGetOne(applicationID string) (applicationInfo datatransfers.ApplicationInfo, err error)

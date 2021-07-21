@@ -9,10 +9,11 @@ import (
 
 func (m *module) ServiceGetAll(applicationID string) (serviceInfos []datatransfers.ServiceInfo, err error) {
 	var services []models.Service
+	serviceInfos = make([]datatransfers.ServiceInfo, 0)
 	if services, err = m.db.serviceOrmer.GetAllByApplicationID(applicationID); err == gorm.ErrRecordNotFound {
-		return nil, nil
+		return serviceInfos, nil
 	} else if err != nil {
-		return nil, err
+		return serviceInfos, err
 	}
 	for _, service := range services {
 		serviceInfos = append(serviceInfos, datatransfers.ServiceInfo{
@@ -23,6 +24,7 @@ func (m *module) ServiceGetAll(applicationID string) (serviceInfos []datatransfe
 			Endpoint:      service.Endpoint,
 			Type:          service.Type,
 			Config:        service.Config,
+			Enabled:       service.Enabled,
 			Showcase:      service.Showcase,
 			CreatedAt:     service.CreatedAt,
 			UpdatedAt:     service.UpdatedAt,
@@ -44,6 +46,7 @@ func (m *module) ServiceGetOne(serviceID, applicationID string) (serviceInfo dat
 		Endpoint:      service.Endpoint,
 		Type:          service.Type,
 		Config:        service.Config,
+		Enabled:       service.Enabled,
 		Showcase:      service.Showcase,
 		CreatedAt:     service.CreatedAt,
 		UpdatedAt:     service.UpdatedAt,
@@ -59,6 +62,7 @@ func (m *module) ServiceCreate(serviceInfo datatransfers.ServiceInfo) (serviceID
 		Endpoint:      serviceInfo.Endpoint,
 		Type:          serviceInfo.Type,
 		Config:        serviceInfo.Config,
+		Enabled:       serviceInfo.Enabled,
 		Showcase:      serviceInfo.Showcase,
 	}); err != nil {
 		return "", err
@@ -75,6 +79,7 @@ func (m *module) ServiceUpdate(serviceInfo datatransfers.ServiceInfo) (err error
 		Endpoint:      serviceInfo.Endpoint,
 		Type:          serviceInfo.Type,
 		Config:        serviceInfo.Config,
+		Enabled:       serviceInfo.Enabled,
 		Showcase:      serviceInfo.Showcase,
 	}); err != nil {
 		return err
