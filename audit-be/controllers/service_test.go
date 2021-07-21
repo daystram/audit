@@ -27,7 +27,7 @@ func (suite *V1ServiceTestSuite) SetupTest() {
 	ctrl := gomock.NewController(suite.T())
 	suite.MockHandler = mock_handlers.NewMockHandlerFunc(ctrl)
 	suite.Router = InitializeRouter(suite.MockHandler)
-	gin.SetMode(gin.ReleaseMode)
+	gin.SetMode(gin.TestMode)
 }
 
 func (suite *V1ServiceTestSuite) TestGETServiceList() {
