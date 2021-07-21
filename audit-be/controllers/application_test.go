@@ -43,7 +43,15 @@ func (suite *V1ApplicationTestSuite) TestGETApplicationList() {
 		req, _ := http.NewRequest(http.MethodGet, "/api/application/", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
-		assert.JSONEq(suite.T(), `{"data": [{"id":"app_id", "name":"Test App", "description": "Description", "createdAt": 1, "updatedAt": 2}]}`, w.Body.String())
+		assert.JSONEq(suite.T(), `{
+			"data": [{
+				"id": "app_id", 
+				"name": "Test App", 
+				"description": "Description", 
+				"createdAt": 1, 
+				"updatedAt": 2
+			}]
+		}`, w.Body.String())
 	})
 	suite.T().Run("no applications", func(t *testing.T) {
 		suite.MockHandler.EXPECT().ApplicationGetAll().Return(make([]datatransfers.ApplicationInfo, 0), nil)
@@ -110,7 +118,15 @@ func (suite *V1ApplicationTestSuite) TestGETApplicationDetail() {
 		req, _ := http.NewRequest(http.MethodGet, "/api/application/app_id", nil)
 		suite.Router.ServeHTTP(w, req)
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
-		assert.JSONEq(suite.T(), `{"data": {"id":"app_id", "name":"Test App", "description": "Description", "createdAt": 1, "updatedAt": 2}}`, w.Body.String())
+		assert.JSONEq(suite.T(), `{
+			"data": {
+				"id": "app_id", 
+				"name": "Test App", 
+				"description": "Description", 
+				"createdAt": 1, 
+				"updatedAt": 2
+			}
+		}`, w.Body.String())
 	})
 	suite.T().Run("no application", func(t *testing.T) {
 		suite.MockHandler.EXPECT().ApplicationGetOne("app_id").Return(datatransfers.ApplicationInfo{}, gorm.ErrRecordNotFound)

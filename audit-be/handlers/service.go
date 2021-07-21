@@ -24,6 +24,7 @@ func (m *module) ServiceGetAll(applicationID string) (serviceInfos []datatransfe
 			Endpoint:      service.Endpoint,
 			Type:          service.Type,
 			Config:        service.Config,
+			Enabled:       service.Enabled,
 			Showcase:      service.Showcase,
 			CreatedAt:     service.CreatedAt,
 			UpdatedAt:     service.UpdatedAt,
@@ -45,6 +46,7 @@ func (m *module) ServiceGetOne(serviceID, applicationID string) (serviceInfo dat
 		Endpoint:      service.Endpoint,
 		Type:          service.Type,
 		Config:        service.Config,
+		Enabled:       service.Enabled,
 		Showcase:      service.Showcase,
 		CreatedAt:     service.CreatedAt,
 		UpdatedAt:     service.UpdatedAt,
@@ -60,6 +62,7 @@ func (m *module) ServiceCreate(serviceInfo datatransfers.ServiceInfo) (serviceID
 		Endpoint:      serviceInfo.Endpoint,
 		Type:          serviceInfo.Type,
 		Config:        serviceInfo.Config,
+		Enabled:       serviceInfo.Enabled,
 		Showcase:      serviceInfo.Showcase,
 	}); err != nil {
 		return "", err
@@ -76,6 +79,7 @@ func (m *module) ServiceUpdate(serviceInfo datatransfers.ServiceInfo) (err error
 		Endpoint:      serviceInfo.Endpoint,
 		Type:          serviceInfo.Type,
 		Config:        serviceInfo.Config,
+		Enabled:       serviceInfo.Enabled,
 		Showcase:      serviceInfo.Showcase,
 	}); err != nil {
 		return err

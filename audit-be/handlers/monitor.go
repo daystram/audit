@@ -26,6 +26,7 @@ func (m *module) MonitorGetAll() (applicationInfos []datatransfers.ApplicationIn
 				Endpoint:      service.Endpoint,
 				Type:          service.Type,
 				Config:        service.Config,
+				Enabled:       service.Enabled,
 				Showcase:      service.Showcase,
 				CreatedAt:     service.CreatedAt,
 				UpdatedAt:     service.UpdatedAt,

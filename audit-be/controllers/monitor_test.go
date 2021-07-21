@@ -40,6 +40,7 @@ func (suite *V1MonitorTestSuite) TestGETMonitorList() {
 				Endpoint:      "https://test.daystram.com",
 				Type:          "http",
 				Config:        "{}",
+				Enabled:       true,
 				Showcase:      true,
 				CreatedAt:     1,
 				UpdatedAt:     2,
@@ -55,19 +56,20 @@ func (suite *V1MonitorTestSuite) TestGETMonitorList() {
 		assert.Equal(suite.T(), http.StatusOK, w.Code)
 		assert.JSONEq(suite.T(), `{
 			"data": [{
-				"id":"app_id",
-				"services":[{
-					"id":"service_id",
-					"name":"Test Service",
-					"description":"Description",
-					"endpoint":"https://test.daystram.com",
-					"type":"http",
-					"config":"{}",
+				"id": "app_id",
+				"services": [{
+					"id": "service_id",
+					"name": "Test Service",
+					"description": "Description",
+					"endpoint": "https://test.daystram.com",
+					"type": "http",
+					"config": "{}",
+					"enabled": true,
 					"showcase": true,
 					"createdAt": 1,
 					"updatedAt": 2
 				}],
-				"name":"Test App",
+				"name": "Test App",
 				"description": "Description",
 				"createdAt": 1,
 				"updatedAt": 2

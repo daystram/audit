@@ -15,6 +15,7 @@ type Service struct {
 	Endpoint    string `gorm:"column:endpoint;type:varchar(50)" json:"-"`
 	Type        string `gorm:"column:type;type:varchar(5)" json:"-"`
 	Config      string `gorm:"column:config;type:text" json:"-"`
+	Enabled     bool   `gorm:"column:enabled;default:false" json:"-"`
 	Showcase    bool   `gorm:"column:showcase;default:false" json:"-"`
 
 	CreatedAt int64 `gorm:"column:created_at;autoCreateTime" json:"-"`
@@ -61,6 +62,7 @@ func (o *serviceOrm) Update(service Service) (err error) {
 		"Endpoint",
 		"Type",
 		"Config",
+		"Enabled",
 		"Showcase",
 		"CreatedAt",
 		"UpdatedAt",
