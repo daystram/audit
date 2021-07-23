@@ -27,6 +27,15 @@ func (suite *HandlerTrackerTestSuite) SetupTest(trackers map[string]TrackerClien
 	}
 }
 
+func (suite *HandlerTrackerTestSuite) SetupTestWithID(trackers map[string]TrackerClient, trackerIDs []string) {
+	suite.Handler = &module{
+		trackerServer: &trackerServerModule{
+			trackers:   trackers,
+			trackerIDs: trackerIDs,
+		},
+	}
+}
+
 func (suite *HandlerTrackerTestSuite) TestInitializeTrackerServer() {
 	suite.T().Run("starts", func(t *testing.T) {
 		suite.SetupTest(make(map[string]TrackerClient))
@@ -68,7 +77,8 @@ func (suite *HandlerTrackerTestSuite) TestSubscribe() {
 func (suite *HandlerTrackerTestSuite) TestSendTrackingRequest() {
 	suite.T().Run("runs", func(t *testing.T) {
 		trackers := make(map[string]TrackerClient)
-		suite.SetupTest(trackers)
+		trackerIDs := []string{"tracker_id"}
+		suite.SetupTestWithID(trackers, trackerIDs)
 		ctrl := gomock.NewController(suite.T())
 		defer ctrl.Finish()
 		mockStream := mock_pb.NewMockTracker_SubscribeServer(ctrl)
@@ -89,14 +99,14 @@ func (suite *HandlerTrackerTestSuite) TestSendTrackingRequest() {
 		err := suite.Handler.trackerServer.SendTrackingRequest(&pb.TrackingRequest{
 			ApplicationId: "app_id",
 			ServiceId:     "service_id",
-			TrackerId:     "tracker_id",
 			Endpoint:      "service.daystram.com:80",
 		})
 		assert.Nil(suite.T(), err)
 	})
 	suite.T().Run("unregistered", func(t *testing.T) {
 		trackers := make(map[string]TrackerClient)
-		suite.SetupTest(trackers)
+		trackerIDs := make([]string, 0)
+		suite.SetupTestWithID(trackers, trackerIDs)
 		err := suite.Handler.trackerServer.SendTrackingRequest(&pb.TrackingRequest{
 			ApplicationId: "app_id",
 			ServiceId:     "service_id",

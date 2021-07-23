@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -29,8 +30,10 @@ type TrackerClient interface {
 
 type trackerServerModule struct {
 	pb.UnimplementedTrackerServer
-	trackers map[string]TrackerClient
-	mu       sync.RWMutex
+	trackers   map[string]TrackerClient
+	trackerIDs []string
+	lastUsed   int
+	mu         sync.RWMutex
 }
 
 type trackerClientEntity struct {
@@ -46,7 +49,7 @@ func (m *module) InitializeTrackerServer(port int) (err error) {
 	if lis, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", port)); err != nil {
 		return err
 	}
-	m.trackerServer = &trackerServerModule{trackers: make(map[string]TrackerClient)}
+	m.trackerServer = &trackerServerModule{trackers: make(map[string]TrackerClient), trackerIDs: make([]string, 0)}
 	// TODO: authentication
 	pb.RegisterTrackerServer(grpcServer, m.trackerServer)
 	go func() {
@@ -70,6 +73,7 @@ func (s *trackerServerModule) Subscribe(request *pb.SubscriptionRequest, stream 
 		id:     trackerID,
 		stream: stream,
 	}
+	s.trackerIDs = append(s.trackerIDs, trackerID)
 	s.mu.Unlock() // immediately unlock
 	log.Printf("[TrackerServer] tracker %s connected. connected trackers: %d\n", trackerID, len(s.trackers))
 	return s.PingTracker(trackerID) // keep alive: locking
@@ -113,6 +117,16 @@ func (s *trackerServerModule) PingTracker(trackerID string) (err error) {
 			s.mu.Lock()
 			defer s.mu.Unlock()
 			delete(s.trackers, trackerID)
+			for i, ID := range s.trackerIDs {
+				if trackerID == ID {
+					s.trackerIDs = append(s.trackerIDs[:i], s.trackerIDs[i+1:]...)
+					break
+				}
+			}
+			if len(s.trackers) != len(s.trackerIDs) {
+				log.Panic("trackers desync")
+				return
+			}
 			log.Printf("[TrackerServer] %s disconnected. connected trackers: %d\n", trackerID, len(s.trackers))
 			return
 		}
@@ -123,12 +137,13 @@ func (s *trackerServerModule) PingTracker(trackerID string) (err error) {
 func (s *trackerServerModule) SendTrackingRequest(request *pb.TrackingRequest) (err error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	// arbitrarily select one tracker. note: not truly random
-	for trackerId, client := range s.trackers {
-		request.TrackerId = trackerId
-		return client.SendTrackingRequest(request)
+	// round-robin
+	if len(s.trackers) == 0 {
+		return errors.New("no registered trackers")
 	}
-	return fmt.Errorf("no registered trackers")
+	s.lastUsed = (s.lastUsed + 1) % len(s.trackers)
+	request.TrackerId = s.trackerIDs[s.lastUsed]
+	return s.trackers[request.TrackerId].SendTrackingRequest(request)
 }
 
 func (c *trackerClientEntity) Ping() (err error) {
