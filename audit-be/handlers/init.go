@@ -34,7 +34,7 @@ type HandlerFunc interface {
 	ServiceDelete(serviceID, applicationID string) (err error)
 
 	// Tracker
-	InitializeTrackerServer(port int)
+	InitializeTrackerServer(port int) (err error)
 }
 
 type module struct {

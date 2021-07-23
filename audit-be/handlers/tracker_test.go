@@ -30,7 +30,8 @@ func (suite *HandlerTrackerTestSuite) SetupTest(trackers map[string]TrackerClien
 func (suite *HandlerTrackerTestSuite) TestInitializeTrackerServer() {
 	suite.T().Run("starts", func(t *testing.T) {
 		suite.SetupTest(make(map[string]TrackerClient))
-		suite.Handler.InitializeTrackerServer(7899)
+		err := suite.Handler.InitializeTrackerServer(7899)
+		assert.Nil(suite.T(), err)
 	})
 }
 

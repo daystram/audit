@@ -40,11 +40,11 @@ type trackerClientEntity struct {
 	latency    int64
 }
 
-func (m *module) InitializeTrackerServer(port int) {
+func (m *module) InitializeTrackerServer(port int) (err error) {
+	var lis net.Listener
 	grpcServer := grpc.NewServer()
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", port))
-	if err != nil {
-		log.Fatalf("[TrackerServer] failed initializing. %v", err)
+	if lis, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", port)); err != nil {
+		return err
 	}
 	m.trackerServer = &trackerServerModule{trackers: make(map[string]TrackerClient)}
 	// TODO: authentication
@@ -54,6 +54,7 @@ func (m *module) InitializeTrackerServer(port int) {
 			log.Fatalf("[TrackerServer] failed starting server. %v", err)
 		}
 	}()
+	return
 }
 
 // implements pb.UnimplementedTrackerServer
