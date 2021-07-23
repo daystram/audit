@@ -121,13 +121,14 @@ func (s *trackerServerModule) PingTracker(trackerID string) (err error) {
 }
 
 func (s *trackerServerModule) SendTrackingRequest(request *pb.TrackingRequest) (err error) {
-	// TODO: example setup
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if client, ok := s.trackers[request.TrackerId]; ok {
+	// arbitrarily select one tracker. note: not truly random
+	for trackerId, client := range s.trackers {
+		request.TrackerId = trackerId
 		return client.SendTrackingRequest(request)
 	}
-	return fmt.Errorf("unregistered trackerID %s", request.TrackerId)
+	return fmt.Errorf("no registered trackers")
 }
 
 func (c *trackerClientEntity) Ping() (err error) {
@@ -136,7 +137,7 @@ func (c *trackerClientEntity) Ping() (err error) {
 		Body: &pb.TrackingMessage_Request{
 			Request: &pb.TrackingRequest{
 				TrackerId:   c.id,
-				RequestedAt: time.Now().UnixNano(), // only PING uses Unix nano
+				RequestedAt: time.Now().UnixNano(),
 			},
 		},
 	})

@@ -7,6 +7,7 @@ import (
 
 	influxlib "github.com/influxdata/influxdb-client-go/v2"
 	"github.com/influxdata/influxdb-client-go/v2/api"
+	"github.com/robfig/cron/v3"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -35,12 +36,17 @@ type HandlerFunc interface {
 
 	// Tracker
 	InitializeTrackerServer(port int) (err error)
+
+	// Scheduler
+	InitializeScheduler() (err error)
+	TriggerTracking()
 }
 
 type module struct {
 	db            *dbEntity
 	influx        *influxEntity
 	trackerServer TrackerServer
+	schedulerCron *cron.Cron
 }
 
 type dbEntity struct {

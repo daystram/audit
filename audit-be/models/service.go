@@ -28,6 +28,7 @@ type serviceOrm struct {
 
 type ServiceOrmer interface {
 	GetAllByApplicationID(applicationID string) (services []Service, err error)
+	GetAllEnabled() (services []Service, err error)
 	GetOneByIDAndApplicationID(ID, applicationID string) (service Service, err error)
 	Insert(service Service) (ID string, err error)
 	Update(service Service) (err error)
@@ -41,6 +42,11 @@ func NewServiceOrmer(db *gorm.DB) ServiceOrmer {
 
 func (o *serviceOrm) GetAllByApplicationID(applicationID string) (services []Service, err error) {
 	result := o.db.Model(&Service{}).Where("application_id = ?", applicationID).Order("name").Find(&services)
+	return services, result.Error
+}
+
+func (o *serviceOrm) GetAllEnabled() (services []Service, err error) {
+	result := o.db.Model(&Service{}).Where("enabled = true").Find(&services)
 	return services, result.Error
 }
 
