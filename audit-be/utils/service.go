@@ -11,8 +11,8 @@ func ServiceTypeToProto(serviceType string) proto.ServiceType {
 		return proto.ServiceType_SERVICE_TYPE_HTTP
 	case constants.ServiceTypeTCP:
 		return proto.ServiceType_SERVICE_TYPE_TCP
-	case constants.ServiceTypeUDP:
-		return proto.ServiceType_SERVICE_TYPE_UDP
+	case constants.ServiceTypePING:
+		return proto.ServiceType_SERVICE_TYPE_PING
 	default:
 		return proto.ServiceType_SERVICE_TYPE_UNKNOWN
 	}
