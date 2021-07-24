@@ -3,5 +3,5 @@ package constants
 import "time"
 
 const (
-	TrackerPingInterval = 5 * time.Second
+	TrackerPingInterval = 10 * time.Second
 )
