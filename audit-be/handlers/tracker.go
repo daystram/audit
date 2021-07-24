@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strconv"
 	"sync"
 	"time"
 
 	"google.golang.org/grpc"
 
 	"github.com/daystram/audit/audit-be/constants"
+	"github.com/daystram/audit/audit-be/models"
 	pb "github.com/daystram/audit/proto"
 )
 
@@ -30,6 +32,7 @@ type TrackerClient interface {
 
 type trackerServerModule struct {
 	pb.UnimplementedTrackerServer
+	handlers   *module
 	trackers   map[string]TrackerClient
 	trackerIDs []string
 	lastUsed   int
@@ -49,7 +52,7 @@ func (m *module) InitializeTrackerServer(port int) (err error) {
 	if lis, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", port)); err != nil {
 		return err
 	}
-	m.trackerServer = &trackerServerModule{trackers: make(map[string]TrackerClient), trackerIDs: make([]string, 0)}
+	m.trackerServer = &trackerServerModule{handlers: m, trackers: make(map[string]TrackerClient), trackerIDs: make([]string, 0)}
 	// TODO: authentication
 	pb.RegisterTrackerServer(grpcServer, m.trackerServer)
 	go func() {
@@ -80,10 +83,36 @@ func (s *trackerServerModule) Subscribe(request *pb.SubscriptionRequest, stream 
 }
 
 // implements pb.UnimplementedTrackerServer
-func (s *trackerServerModule) ReportTrackingRequest(ctx context.Context, message *pb.TrackingMessage) (*pb.Empty, error) {
-	// TODO: implement
+func (s *trackerServerModule) ReportTrackingRequest(ctx context.Context, message *pb.TrackingMessage) (resp *pb.Empty, err error) {
 	response := message.Body.(*pb.TrackingMessage_Response).Response
-	log.Printf("[TrackerServer] receive tracking response from %s: %+v", response.TrackerId, response)
+	var application models.Application
+	if application, err = s.handlers.db.applicationOrmer.GetOneByID(response.ApplicationId); err != nil {
+		return &pb.Empty{}, nil
+	}
+	var service models.Service
+	if service, err = s.handlers.db.serviceOrmer.GetOneByIDAndApplicationID(response.ServiceId, response.ApplicationId); err != nil {
+		return &pb.Empty{}, nil
+	}
+	switch response.Status {
+	case pb.ServiceStatus_SERVICE_STATUS_UP:
+		switch service.Type {
+		case constants.ServiceTypeHTTP:
+			var code int
+			if code, err = strconv.Atoi(response.Body); err != nil {
+				return &pb.Empty{}, nil
+			}
+			log.Printf("[TrackerServer] HTTP %s/%s -> latency:%dms, code:%d\n", application.Name, service.Name, response.ResponseTime/1e6, code)
+			// TODO
+		case constants.ServiceTypeTCP:
+			log.Printf("[TrackerServer] TCP  %s/%s -> latency:%dms\n", application.Name, service.Name, response.ResponseTime/1e6)
+			// TODO
+		case constants.ServiceTypePING:
+			log.Printf("[TrackerServer] PING %s/%s -> latency:%dms\n", application.Name, service.Name, response.ResponseTime/1e6)
+			// TODO
+		}
+	default:
+		log.Printf("[TrackerServer] ERR  %s/%s @ trackerID:%s -> err: %s\n", application.Name, service.Name, response.TrackerId, response.Body)
+	}
 	return &pb.Empty{}, nil
 }
 
@@ -92,7 +121,7 @@ func (s *trackerServerModule) Pong(ctx context.Context, message *pb.TrackingMess
 	request := message.Body.(*pb.TrackingMessage_Request).Request
 	trackerID := request.TrackerId
 	latency := time.Now().UnixNano() - request.RequestedAt
-	log.Printf("[TrackerServer] latency to %s: %dms", trackerID, latency/1e6)
+	log.Printf("[TrackerServer] PING-TR trackerID:%s -> latency:%dms", trackerID, latency/1e6)
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	if client, ok := s.trackers[trackerID]; !ok {
@@ -124,10 +153,10 @@ func (s *trackerServerModule) PingTracker(trackerID string) (err error) {
 				}
 			}
 			if len(s.trackers) != len(s.trackerIDs) {
-				log.Panic("trackers desync")
+				log.Fatalln("trackers desync")
 				return
 			}
-			log.Printf("[TrackerServer] %s disconnected. connected trackers: %d\n", trackerID, len(s.trackers))
+			log.Printf("[TrackerServer] trackerID:%s disconnected. connected trackers: %d\n", trackerID, len(s.trackers))
 			return
 		}
 		time.Sleep(constants.TrackerPingInterval)
