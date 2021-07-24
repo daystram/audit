@@ -99,7 +99,6 @@
                 <v-btn
                   text
                   rounded
-                  plain
                   color="error"
                   @click="resetDeleteApplication(application)"
                 >
@@ -108,7 +107,6 @@
                 <v-btn
                   text
                   rounded
-                  plain
                   color="warning"
                   class="ml-4"
                   @click="resetUpdateApplication(application)"
@@ -158,18 +156,18 @@
                         <v-expansion-panel-content>
                           <v-row>
                             <v-col cols="12">
-                              <v-text-field
-                                v-model.trim="service.endpoint"
-                                label="Endpoint"
-                                disabled
-                                :prepend-icon="'mdi-link'"
-                              />
                               <v-select
                                 v-model.trim="service.type"
                                 label="Type"
                                 disabled
                                 :items="SERVICE_TYPE_LIST"
                                 :prepend-icon="'mdi-cogs'"
+                              />
+                              <v-text-field
+                                v-model.trim="service.endpoint"
+                                label="Endpoint"
+                                disabled
+                                :prepend-icon="'mdi-link'"
                               />
                               <v-textarea
                                 v-model.trim="service.config"
@@ -186,7 +184,6 @@
                               <v-btn
                                 text
                                 rounded
-                                plain
                                 block
                                 color="error"
                                 @click="
@@ -200,7 +197,6 @@
                               <v-btn
                                 text
                                 rounded
-                                plain
                                 block
                                 color="warning"
                                 @click="
@@ -217,8 +213,8 @@
                   </v-row>
                   <v-row>
                     <v-btn
+                      text
                       rounded
-                      plain
                       block
                       color="primary"
                       @click="resetCreateService(application)"
@@ -550,18 +546,6 @@
                 @blur="$v.createService.service.description.$touch()"
                 :prepend-icon="'mdi-text'"
               />
-              <v-text-field
-                v-model.trim="createService.service.endpoint"
-                :error-messages="createServiceEndpointErrors"
-                :counter="50"
-                label="Endpoint"
-                hint="URL with protocol or IP address"
-                required
-                :disabled="createService.formLoadStatus === STATUS.LOADING"
-                @input="$v.createService.service.endpoint.$touch()"
-                @blur="$v.createService.service.endpoint.$touch()"
-                :prepend-icon="'mdi-link'"
-              />
               <v-select
                 v-model.trim="createService.service.type"
                 label="Type"
@@ -569,6 +553,18 @@
                 :items="SERVICE_TYPE_LIST"
                 :disabled="createService.formLoadStatus === STATUS.LOADING"
                 :prepend-icon="'mdi-cogs'"
+              />
+              <v-text-field
+                v-model.trim="createService.service.endpoint"
+                :error-messages="createServiceEndpointErrors"
+                :counter="50"
+                label="Endpoint"
+                hint="Include protocol only for HTTP service, do not include port for PING service"
+                required
+                :disabled="createService.formLoadStatus === STATUS.LOADING"
+                @input="$v.createService.service.endpoint.$touch()"
+                @blur="$v.createService.service.endpoint.$touch()"
+                :prepend-icon="'mdi-link'"
               />
               <v-textarea
                 v-model.trim="createService.service.config"
@@ -682,18 +678,6 @@
                 @blur="$v.updateService.service.description.$touch()"
                 :prepend-icon="'mdi-text'"
               />
-              <v-text-field
-                v-model.trim="updateService.service.endpoint"
-                :error-messages="updateServiceEndpointErrors"
-                :counter="50"
-                label="Endpoint"
-                hint="URL with protocol or IP address"
-                required
-                :disabled="updateService.formLoadStatus === STATUS.LOADING"
-                @input="$v.updateService.service.endpoint.$touch()"
-                @blur="$v.updateService.service.endpoint.$touch()"
-                :prepend-icon="'mdi-link'"
-              />
               <v-select
                 v-model.trim="updateService.service.type"
                 label="Type"
@@ -701,6 +685,18 @@
                 :items="SERVICE_TYPE_LIST"
                 :disabled="updateService.formLoadStatus === STATUS.LOADING"
                 :prepend-icon="'mdi-cogs'"
+              />
+              <v-text-field
+                v-model.trim="updateService.service.endpoint"
+                :error-messages="updateServiceEndpointErrors"
+                :counter="50"
+                label="Endpoint"
+                hint="Include protocol only for HTTP service, do not include port for PING service"
+                required
+                :disabled="updateService.formLoadStatus === STATUS.LOADING"
+                @input="$v.updateService.service.endpoint.$touch()"
+                @blur="$v.updateService.service.endpoint.$touch()"
+                :prepend-icon="'mdi-link'"
               />
               <v-textarea
                 v-model.trim="updateService.service.config"

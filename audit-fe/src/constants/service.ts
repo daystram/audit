@@ -8,11 +8,11 @@ export enum SERVICE_STATUS {
 export enum SERVICE_TYPE {
   HTTP = "HTTP",
   TCP = "TCP",
-  UDP = "UDP",
+  PING = "PING",
 }
 
 export const SERVICE_TYPE_LIST = [
   { text: SERVICE_TYPE.HTTP, value: "http" },
   { text: SERVICE_TYPE.TCP, value: "tcp" },
-  { text: SERVICE_TYPE.UDP, value: "udp" },
+  { text: SERVICE_TYPE.PING, value: "ping" },
 ];
