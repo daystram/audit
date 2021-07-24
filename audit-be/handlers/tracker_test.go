@@ -10,6 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/daystram/audit/audit-be/constants"
+	mock_models "github.com/daystram/audit/audit-be/mocks/models"
+	"github.com/daystram/audit/audit-be/models"
 	pb "github.com/daystram/audit/proto"
 	mock_pb "github.com/daystram/audit/proto/mocks"
 )
@@ -32,6 +35,15 @@ func (suite *HandlerTrackerTestSuite) SetupTestWithID(trackers map[string]Tracke
 		trackerServer: &trackerServerModule{
 			trackers:   trackers,
 			trackerIDs: trackerIDs,
+		},
+	}
+}
+
+func (suite *HandlerTrackerTestSuite) SetupTestWithInjectedHandler(trackers map[string]TrackerClient, handlers *module) {
+	suite.Handler = &module{
+		trackerServer: &trackerServerModule{
+			handlers: handlers,
+			trackers: trackers,
 		},
 	}
 }
@@ -118,10 +130,21 @@ func (suite *HandlerTrackerTestSuite) TestSendTrackingRequest() {
 }
 
 func (suite *HandlerTrackerTestSuite) TestReportTrackingRequest() {
-	suite.T().Run("runs", func(t *testing.T) {
+	suite.T().Run("HTTP service", func(t *testing.T) {
 		trackers := make(map[string]TrackerClient)
-		suite.SetupTest(trackers)
-		trackers["tracker_id"] = &trackerClientEntity{}
+		ctrl := gomock.NewController(suite.T())
+		defer ctrl.Finish()
+		mockApplicationOrmer := mock_models.NewMockApplicationOrmer(ctrl)
+		mockServiceOrmer := mock_models.NewMockServiceOrmer(ctrl)
+		handlers := &module{
+			db: &dbEntity{
+				applicationOrmer: mockApplicationOrmer,
+				serviceOrmer:     mockServiceOrmer,
+			},
+		}
+		suite.SetupTestWithInjectedHandler(trackers, handlers)
+		mockApplicationOrmer.EXPECT().GetOneByID("app_id").Return(models.Application{ID: "app_id"}, nil)
+		mockServiceOrmer.EXPECT().GetOneByIDAndApplicationID("service_id", "app_id").Return(models.Service{ID: "service_id", Type: constants.ServiceTypeHTTP}, nil)
 		_, err := suite.Handler.trackerServer.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
 			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
 			Body: &pb.TrackingMessage_Response{
@@ -129,6 +152,67 @@ func (suite *HandlerTrackerTestSuite) TestReportTrackingRequest() {
 					ApplicationId: "app_id",
 					ServiceId:     "service_id",
 					TrackerId:     "tracker_id",
+					Status:        pb.ServiceStatus_SERVICE_STATUS_UP,
+					Body:          "200",
+					ResponseTime:  (1 * time.Second).Nanoseconds(),
+				},
+			},
+		})
+		assert.Nil(suite.T(), err)
+	})
+	suite.T().Run("TCP service", func(t *testing.T) {
+		trackers := make(map[string]TrackerClient)
+		ctrl := gomock.NewController(suite.T())
+		defer ctrl.Finish()
+		mockApplicationOrmer := mock_models.NewMockApplicationOrmer(ctrl)
+		mockServiceOrmer := mock_models.NewMockServiceOrmer(ctrl)
+		handlers := &module{
+			db: &dbEntity{
+				applicationOrmer: mockApplicationOrmer,
+				serviceOrmer:     mockServiceOrmer,
+			},
+		}
+		suite.SetupTestWithInjectedHandler(trackers, handlers)
+		mockApplicationOrmer.EXPECT().GetOneByID("app_id").Return(models.Application{ID: "app_id"}, nil)
+		mockServiceOrmer.EXPECT().GetOneByIDAndApplicationID("service_id", "app_id").Return(models.Service{ID: "service_id", Type: constants.ServiceTypeTCP}, nil)
+		_, err := suite.Handler.trackerServer.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
+			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
+			Body: &pb.TrackingMessage_Response{
+				Response: &pb.TrackingResponse{
+					ApplicationId: "app_id",
+					ServiceId:     "service_id",
+					TrackerId:     "tracker_id",
+					Status:        pb.ServiceStatus_SERVICE_STATUS_UP,
+					ResponseTime:  (1 * time.Second).Nanoseconds(),
+				},
+			},
+		})
+		assert.Nil(suite.T(), err)
+	})
+	suite.T().Run("PING service", func(t *testing.T) {
+		trackers := make(map[string]TrackerClient)
+		ctrl := gomock.NewController(suite.T())
+		defer ctrl.Finish()
+		mockApplicationOrmer := mock_models.NewMockApplicationOrmer(ctrl)
+		mockServiceOrmer := mock_models.NewMockServiceOrmer(ctrl)
+		handlers := &module{
+			db: &dbEntity{
+				applicationOrmer: mockApplicationOrmer,
+				serviceOrmer:     mockServiceOrmer,
+			},
+		}
+		suite.SetupTestWithInjectedHandler(trackers, handlers)
+		mockApplicationOrmer.EXPECT().GetOneByID("app_id").Return(models.Application{ID: "app_id"}, nil)
+		mockServiceOrmer.EXPECT().GetOneByIDAndApplicationID("service_id", "app_id").Return(models.Service{ID: "service_id", Type: constants.ServiceTypePING}, nil)
+		_, err := suite.Handler.trackerServer.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
+			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
+			Body: &pb.TrackingMessage_Response{
+				Response: &pb.TrackingResponse{
+					ApplicationId: "app_id",
+					ServiceId:     "service_id",
+					TrackerId:     "tracker_id",
+					Status:        pb.ServiceStatus_SERVICE_STATUS_UP,
+					ResponseTime:  (1 * time.Second).Nanoseconds(),
 				},
 			},
 		})
