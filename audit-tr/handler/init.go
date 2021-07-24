@@ -29,7 +29,7 @@ func InitializeHandler(conn *grpc.ClientConn) (handler *module, err error) {
 	}); err != nil {
 		log.Fatalf("[INIT] Failed dialling to audit-be. %v", err)
 	}
-	log.Println("[INIT] Successfully connected to audit-be!")
+	log.Println("[INIT] Successfully connected to audit-be")
 
 	handler = &module{
 		conn:   conn,
