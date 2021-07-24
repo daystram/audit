@@ -32,7 +32,7 @@ type TrackerClient interface {
 
 type trackerServerModule struct {
 	pb.UnimplementedTrackerServer
-	handlers   *module
+	handlers   *module // injected handler module reference
 	trackers   map[string]TrackerClient
 	trackerIDs []string
 	lastUsed   int
@@ -99,7 +99,7 @@ func (s *trackerServerModule) ReportTrackingRequest(ctx context.Context, message
 		case constants.ServiceTypeHTTP:
 			var code int
 			if code, err = strconv.Atoi(response.Body); err != nil {
-				return &pb.Empty{}, nil
+				return &pb.Empty{}, fmt.Errorf("invalid body for HTTP service")
 			}
 			log.Printf("[TrackerServer] HTTP %s/%s -> latency:%dms, code:%d\n", application.Name, service.Name, response.ResponseTime/1e6, code)
 			// TODO
