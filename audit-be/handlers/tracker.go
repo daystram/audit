@@ -110,6 +110,16 @@ func (s *trackerServerModule) ReportTrackingRequest(ctx context.Context, message
 			log.Printf("[TrackerServer] PING %s/%s -> latency:%dms\n", application.Name, service.Name, response.ResponseTime/1e6)
 			// TODO
 		}
+		if err = s.handlers.influx.reportOrmer.Insert(models.Report{
+			ApplicationID: response.ApplicationId,
+			ServiceID:     response.ServiceId,
+			Latency:       response.ResponseTime,
+			Timestamp:     response.ExecutedAt,
+		}); err != nil {
+			log.Println(err)
+		}
+	case pb.ServiceStatus_SERVICE_STATUS_UNREACHABLE:
+		log.Printf("[TrackerServer] DOWN %s/%s @ trackerID:%s -> unreachable: %s\n", application.Name, service.Name, response.TrackerId, response.Body)
 	default:
 		log.Printf("[TrackerServer] ERR  %s/%s @ trackerID:%s -> err: %s\n", application.Name, service.Name, response.TrackerId, response.Body)
 	}
