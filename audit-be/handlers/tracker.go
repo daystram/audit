@@ -49,9 +49,10 @@ type trackerClientEntity struct {
 func (m *module) InitializeTrackerServer(port int) (err error) {
 	var lis net.Listener
 	grpcServer := grpc.NewServer()
-	if lis, err = net.Listen("tcp", fmt.Sprintf("localhost:%d", port)); err != nil {
+	if lis, err = net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", port)); err != nil {
 		return err
 	}
+	log.Printf("[TrackerServer] starting server on 0.0.0.0:%d\n", port)
 	m.trackerServer = &trackerServerModule{handlers: m, trackers: make(map[string]TrackerClient), trackerIDs: make([]string, 0)}
 	// TODO: authentication
 	pb.RegisterTrackerServer(grpcServer, m.trackerServer)
