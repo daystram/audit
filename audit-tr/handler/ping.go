@@ -44,7 +44,7 @@ func (m *module) TrackPING(request *pb.TrackingRequest) pb.TrackingResponse {
 		ServiceId:     request.ServiceId,
 		TrackerId:     config.AppConfig.TrackerID,
 		Status:        pb.ServiceStatus_SERVICE_STATUS_UP,
-		ResponseTime:  int64(pinger.Statistics().AvgRtt * 1e6), // for consistency, use nanoseconds
+		ResponseTime:  int64(pinger.Statistics().AvgRtt),
 		ExecutedAt:    init.UnixNano(),
 	}
 }
