@@ -136,15 +136,24 @@ func (suite *HandlerTrackerTestSuite) TestReportTrackingRequest() {
 		defer ctrl.Finish()
 		mockApplicationOrmer := mock_models.NewMockApplicationOrmer(ctrl)
 		mockServiceOrmer := mock_models.NewMockServiceOrmer(ctrl)
+		mockReportOrmer := mock_models.NewMockReportOrmer(ctrl)
 		handlers := &module{
 			db: &dbEntity{
 				applicationOrmer: mockApplicationOrmer,
 				serviceOrmer:     mockServiceOrmer,
 			},
+			influx: &influxEntity{
+				reportOrmer: mockReportOrmer,
+			},
 		}
 		suite.SetupTestWithInjectedHandler(trackers, handlers)
 		mockApplicationOrmer.EXPECT().GetOneByID("app_id").Return(models.Application{ID: "app_id"}, nil)
 		mockServiceOrmer.EXPECT().GetOneByIDAndApplicationID("service_id", "app_id").Return(models.Service{ID: "service_id", Type: constants.ServiceTypeHTTP}, nil)
+		mockReportOrmer.EXPECT().Insert(models.Report{
+			ApplicationID: "app_id",
+			ServiceID:     "service_id",
+			Latency:       (1 * time.Second).Nanoseconds(),
+		}).Return(nil)
 		_, err := suite.Handler.trackerServer.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
 			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
 			Body: &pb.TrackingMessage_Response{
@@ -166,15 +175,24 @@ func (suite *HandlerTrackerTestSuite) TestReportTrackingRequest() {
 		defer ctrl.Finish()
 		mockApplicationOrmer := mock_models.NewMockApplicationOrmer(ctrl)
 		mockServiceOrmer := mock_models.NewMockServiceOrmer(ctrl)
+		mockReportOrmer := mock_models.NewMockReportOrmer(ctrl)
 		handlers := &module{
 			db: &dbEntity{
 				applicationOrmer: mockApplicationOrmer,
 				serviceOrmer:     mockServiceOrmer,
 			},
+			influx: &influxEntity{
+				reportOrmer: mockReportOrmer,
+			},
 		}
 		suite.SetupTestWithInjectedHandler(trackers, handlers)
 		mockApplicationOrmer.EXPECT().GetOneByID("app_id").Return(models.Application{ID: "app_id"}, nil)
 		mockServiceOrmer.EXPECT().GetOneByIDAndApplicationID("service_id", "app_id").Return(models.Service{ID: "service_id", Type: constants.ServiceTypeTCP}, nil)
+		mockReportOrmer.EXPECT().Insert(models.Report{
+			ApplicationID: "app_id",
+			ServiceID:     "service_id",
+			Latency:       (1 * time.Second).Nanoseconds(),
+		}).Return(nil)
 		_, err := suite.Handler.trackerServer.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
 			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
 			Body: &pb.TrackingMessage_Response{
@@ -195,15 +213,24 @@ func (suite *HandlerTrackerTestSuite) TestReportTrackingRequest() {
 		defer ctrl.Finish()
 		mockApplicationOrmer := mock_models.NewMockApplicationOrmer(ctrl)
 		mockServiceOrmer := mock_models.NewMockServiceOrmer(ctrl)
+		mockReportOrmer := mock_models.NewMockReportOrmer(ctrl)
 		handlers := &module{
 			db: &dbEntity{
 				applicationOrmer: mockApplicationOrmer,
 				serviceOrmer:     mockServiceOrmer,
 			},
+			influx: &influxEntity{
+				reportOrmer: mockReportOrmer,
+			},
 		}
 		suite.SetupTestWithInjectedHandler(trackers, handlers)
 		mockApplicationOrmer.EXPECT().GetOneByID("app_id").Return(models.Application{ID: "app_id"}, nil)
 		mockServiceOrmer.EXPECT().GetOneByIDAndApplicationID("service_id", "app_id").Return(models.Service{ID: "service_id", Type: constants.ServiceTypePING}, nil)
+		mockReportOrmer.EXPECT().Insert(models.Report{
+			ApplicationID: "app_id",
+			ServiceID:     "service_id",
+			Latency:       (1 * time.Second).Nanoseconds(),
+		}).Return(nil)
 		_, err := suite.Handler.trackerServer.ReportTrackingRequest(context.Background(), &pb.TrackingMessage{
 			Code: pb.MessageType_MESSAGE_TYPE_TRACKING,
 			Body: &pb.TrackingMessage_Response{

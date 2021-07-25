@@ -17,23 +17,31 @@ type HandlerMonitorTestSuite struct {
 	suite.Suite
 	Handler              *module
 	MockApplicationOrmer *mock_models.MockApplicationOrmer
+	MockReportOrmer      *mock_models.MockReportOrmer
 }
 
 func (suite *HandlerMonitorTestSuite) SetupTest() {
 	ctrl := gomock.NewController(suite.T())
 	suite.MockApplicationOrmer = mock_models.NewMockApplicationOrmer(ctrl)
+	suite.MockReportOrmer = mock_models.NewMockReportOrmer(ctrl)
 	suite.Handler = &module{
 		db: &dbEntity{
 			applicationOrmer: suite.MockApplicationOrmer,
 		},
+		influx: &influxEntity{
+			reportOrmer: suite.MockReportOrmer,
+		},
 	}
 }
 
-func (suite *HandlerApplicationTestSuite) TestMonitorGetAll() {
+func (suite *HandlerMonitorTestSuite) TestMonitorGetAll() {
 	suite.T().Run("applications exist", func(t *testing.T) {
 		suite.MockApplicationOrmer.EXPECT().GetAllShowcaseWithServices().Return([]models.Application{{
-			Services: []models.Service{{}, {}},
+			ID:       "app_id",
+			Services: []models.Service{{ID: "service_id1"}, {ID: "service_id2"}},
 		}}, nil)
+		suite.MockReportOrmer.EXPECT().GetWindowByApplicationIDAndServiceID("app_id", "service_id1").Return([]models.Report{{}}, nil)
+		suite.MockReportOrmer.EXPECT().GetWindowByApplicationIDAndServiceID("app_id", "service_id2").Return([]models.Report{{}}, nil)
 		applications, err := suite.Handler.MonitorGetAll()
 		assert.Equal(t, 1, len(applications))
 		assert.Equal(t, 2, len(applications[0].Services))
