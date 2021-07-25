@@ -18,9 +18,21 @@ func (m *module) MonitorGetAll() (applicationInfos []datatransfers.ApplicationIn
 	for _, application := range applications {
 		serviceInfos := make([]datatransfers.ServiceInfo, 0)
 		for _, service := range application.Services {
+			var reports []models.Report
+			reportInfos := make([]datatransfers.ReportInfo, 0)
+			if reports, err = m.influx.reportOrmer.GetWindowByApplicationIDAndServiceID(application.ID, service.ID); err != nil {
+				return nil, err
+			}
+			for _, report := range reports {
+				reportInfos = append(reportInfos, datatransfers.ReportInfo{
+					Latency:   report.Latency,
+					Timestamp: report.Timestamp,
+				})
+			}
 			serviceInfos = append(serviceInfos, datatransfers.ServiceInfo{
 				ID:            service.ID,
 				ApplicationID: service.ApplicationID,
+				Reports:       reportInfos,
 				Name:          service.Name,
 				Description:   service.Description,
 				Endpoint:      service.Endpoint,
