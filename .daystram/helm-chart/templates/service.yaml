@@ -31,6 +31,10 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: 8855
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
   selector:
     {{- include "audit.selectorLabels" . | nindent 4 }}
     tier: be
