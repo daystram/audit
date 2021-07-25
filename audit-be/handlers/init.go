@@ -93,7 +93,7 @@ func InitializeHandler() (handler *module, err error) {
 		},
 		influx: &influxEntity{
 			conn:        &influx,
-			reportOrmer: models.NewReportOrmer(influx, config.AppConfig.InfluxDBOrganization, config.AppConfig.InfluxDBReportsBucket),
+			reportOrmer: models.NewReportOrmer(influx, config.AppConfig.InfluxDBOrganization, config.AppConfig.InfluxDBBucketReports),
 		},
 	}
 	return
