@@ -51,15 +51,19 @@ func (o *reportOrm) GetWindowByApplicationIDAndServiceID(applicationID, serviceI
 		|> filter(fn: (r) => r["application_id"] == "%s")
 		|> filter(fn: (r) => r["service_id"] == "%s")
 		|> filter(fn: (r) => r["_field"] == "%s")
-		|> aggregateWindow(every: 10s, fn: mean, createEmpty: false)
+		|> aggregateWindow(every: 1m, fn: mean, createEmpty: true)
 		|> yield(name: "mean")
 	`, o.bucket, _ReportQueryWindow, _ReportMeasurement, applicationID, serviceID, _ReportFieldLatency)); err == nil {
 		for result.Next() {
 			record := result.Record()
+			latency := int64(0)
+			if record.Value() != nil {
+				latency = int64(record.Value().(float64))
+			}
 			reports = append(reports, Report{
 				ApplicationID: applicationID,
 				ServiceID:     serviceID,
-				Latency:       int64(result.Record().Value().(float64)),
+				Latency:       latency,
 				Timestamp:     record.Time().UnixNano(),
 			})
 		}
