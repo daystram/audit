@@ -102,9 +102,14 @@
                       </template>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content>
-                      <v-row>
+                      <v-row class="pt-6">
                         <v-col cols="12">
-                          <div>WIP</div>
+                          <line-chart
+                            v-if="service.reports"
+                            :chart-data="processReport(service.reports)"
+                            class="chart"
+                          />
+                          <div v-else>No data available.</div>
                         </v-col>
                       </v-row>
                     </v-expansion-panel-content>
@@ -145,16 +150,22 @@
 
 <script lang="ts">
 import Vue from "vue";
+import { ChartData } from "chart.js";
 import api from "@/apis";
+import LineChart from "@/components/LineChart.vue";
 import { SERVICE_STATUS, STATUS } from "@/constants";
-import { ApplicationInfo, ServiceInfo } from "@/apis/datatransfers";
+import { ApplicationInfo, ReportInfo, ServiceInfo } from "@/apis/datatransfers";
 export default Vue.extend({
+  components: {
+    LineChart,
+  },
   data() {
     return {
       STATUS,
       SERVICE_STATUS,
       pageLoadStatus: STATUS.PRE_LOADING,
       applications: new Array<ApplicationInfo>(),
+      datacollection: {},
     };
   },
   created() {
@@ -184,6 +195,18 @@ export default Vue.extend({
       if (!service.enabled) return SERVICE_STATUS.DISABLED;
       // TODO
       return SERVICE_STATUS.OK;
+    },
+    processReport(reports: Array<ReportInfo>): ChartData {
+      return {
+        datasets: [
+          {
+            data: reports.map((report) => ({
+              t: new Date(report.timestamp / 1e6),
+              y: report.latency / 1e6,
+            })),
+          },
+        ],
+      };
     },
   },
 });

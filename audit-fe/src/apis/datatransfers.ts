@@ -24,6 +24,7 @@ export class ApplicationInfo {
 
 export class ServiceInfo {
   id?: string;
+  reports: Array<ReportInfo>;
   name: string;
   description: string;
   endpoint: string;
@@ -41,6 +42,7 @@ export class ServiceInfo {
   constructor(source: any = {}) {
     if ("string" === typeof source) source = JSON.parse(source);
     this.id = source["id"];
+    this.reports = source["reports"];
     this.name = source["name"];
     this.description = source["description"];
     this.endpoint = source["endpoint"];
@@ -50,5 +52,20 @@ export class ServiceInfo {
     this.showcase = source["showcase"];
     this.createdAt = source["createdAt"];
     this.updatedAt = source["updatedAt"];
+  }
+}
+
+export class ReportInfo {
+  latency: number;
+  timestamp: number;
+
+  static createFrom(source: any = {}): ReportInfo {
+    return new ReportInfo(source);
+  }
+
+  constructor(source: any = {}) {
+    if ("string" === typeof source) source = JSON.parse(source);
+    this.latency = source["latency"];
+    this.timestamp = source["timestamp"];
   }
 }

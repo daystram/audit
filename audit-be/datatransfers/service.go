@@ -1,8 +1,9 @@
 package datatransfers
 
 type ServiceInfo struct {
-	ID            string `json:"id,omitempty" binding:"-"`
-	ApplicationID string `json:"-" binding:"-"`
+	ID            string       `json:"id,omitempty" binding:"-"`
+	ApplicationID string       `json:"-" binding:"-"`
+	Reports       []ReportInfo `json:"reports,omitempty" binding:"-"`
 
 	Name        string `json:"name" binding:"required"`
 	Description string `json:"description" binding:"required"`

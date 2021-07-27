@@ -6,7 +6,7 @@ import (
 	"log"
 
 	influxlib "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/influxdata/influxdb-client-go/v2/api"
+	"github.com/robfig/cron/v3"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
@@ -34,13 +34,18 @@ type HandlerFunc interface {
 	ServiceDelete(serviceID, applicationID string) (err error)
 
 	// Tracker
-	InitializeTrackerServer(port int)
+	InitializeTrackerServer(port int) (err error)
+
+	// Scheduler
+	InitializeScheduler() (err error)
+	TriggerTracking()
 }
 
 type module struct {
 	db            *dbEntity
 	influx        *influxEntity
 	trackerServer TrackerServer
+	schedulerCron *cron.Cron
 }
 
 type dbEntity struct {
@@ -50,9 +55,8 @@ type dbEntity struct {
 }
 
 type influxEntity struct {
-	conn     *influxlib.Client
-	writeAPI api.WriteAPI
-	queryAPI api.QueryAPI
+	conn        *influxlib.Client
+	reportOrmer models.ReportOrmer
 }
 
 func InitializeHandler() (handler *module, err error) {
@@ -88,9 +92,8 @@ func InitializeHandler() (handler *module, err error) {
 			serviceOrmer:     models.NewServiceOrmer(db),
 		},
 		influx: &influxEntity{
-			conn:     &influx,
-			writeAPI: influx.WriteAPI(config.AppConfig.InfluxDBOrganization, config.AppConfig.InfluxDBBucket),
-			queryAPI: influx.QueryAPI(config.AppConfig.InfluxDBOrganization),
+			conn:        &influx,
+			reportOrmer: models.NewReportOrmer(influx, config.AppConfig.InfluxDBOrganization, config.AppConfig.InfluxDBBucketReports),
 		},
 	}
 	return

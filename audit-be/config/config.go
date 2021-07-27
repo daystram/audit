@@ -25,10 +25,11 @@ type Config struct {
 	DBUsername string
 	DBPassword string
 
-	InfluxDBURL          string
-	InfluxDBToken        string
-	InfluxDBOrganization string
-	InfluxDBBucket       string
+	InfluxDBURL             string
+	InfluxDBToken           string
+	InfluxDBOrganization    string
+	InfluxDBBucketReports   string
+	InfluxDBBucketIndicents string
 }
 
 func InitializeAppConfig() {
@@ -60,7 +61,8 @@ func InitializeAppConfig() {
 	AppConfig.InfluxDBURL = viper.GetString("INFLUXDB_URL")
 	AppConfig.InfluxDBToken = viper.GetString("INFLUXDB_TOKEN")
 	AppConfig.InfluxDBOrganization = viper.GetString("INFLUXDB_ORGANIZATION")
-	AppConfig.InfluxDBBucket = viper.GetString("INFLUXDB_BUCKET")
+	AppConfig.InfluxDBBucketReports = viper.GetString("INFLUXDB_BUCKET_REPORTS")
+	AppConfig.InfluxDBBucketIndicents = viper.GetString("INFLUXDB_BUCKET_INCIDENTS")
 
 	log.Printf("[INIT] Configuration loaded!")
 }
